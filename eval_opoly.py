@@ -18,7 +18,7 @@ def eval_opoly(x,n,a,b,d=0) :
     x = x.ravel()
     n = n.ravel()
 
-    p = _np.zeros([x.size, N+2 d+1]);
+    p = _np.zeros([x.size, N+2, d+1]);
 
     p[:,0,0] = 1.;
     
@@ -31,10 +31,3 @@ def eval_opoly(x,n,a,b,d=0) :
         p[:,q+2] = (x-a[q+1])*p[:,q+1] - b[q+1]*p[:,q]
 
     return p[:,n]
-
-
-#for q=1:N;
-#  p(:,q+2) = (x-alpha(q+1)).*p(:,q+1) - beta(q+1)*p(:,q);
-#end
-#
-#p = p(:,n+1);

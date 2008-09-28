@@ -4,3 +4,6 @@
 # 20080927 -- acn
 
 from eval_opoly import *
+# import jacobi
+
+print "Imported opoly1"

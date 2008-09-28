@@ -3,12 +3,14 @@
 # Includes the Jacobi recurrence relation
 
 import numpy as _np
-import numfun as _nf
+import scipy.special as _nf
 
 # Returns the first N Jacobi recurrence coefficients
-def jacobi_recurrence(N,alpha=-1/2,beta-1/2,shift=0,scale=1) :
+def recurrence(N,alpha=-1/2.,beta=-1/2.,shift=0,scale=1) :
 
-    a_s = (beta**2-alpha**2)_np.ones([N,1])
+    alpha = float(alpha)
+    beta = float(beta)
+    a_s = (beta**2-alpha**2)*_np.ones([N,1])
     b_s = _np.zeros([N,1])
 
     a_s[0] = (beta-alpha)/(alpha+beta+2);
@@ -21,7 +23,10 @@ def jacobi_recurrence(N,alpha=-1/2,beta-1/2,shift=0,scale=1) :
         if k==1 :
             b_s[k] = 4*k*(k+alpha)*(k+beta)/((2*k+alpha+beta)**2*(2*k+alpha+beta+1))
         else :
-            b_s[k] = (4*k*(k+alpha)*(k+beta)*(k+alpha+beta)/ 
-                     (2*k+alpha+beta)**2*(2*k+alpha+beta+1)*(2*k+alpha+beta-1))
+            num = 4*k*(k+alpha)*(k+beta)*(k+alpha+beta)
+            den =  (2*k+alpha+beta)**2*(2*k+alpha+beta+1)*(2*k+alpha+beta-1)
+            b_s[k] = num/den
+
+    return [a_s,b_s]
         
     # Still have recurrence_scaleshift to deal with
