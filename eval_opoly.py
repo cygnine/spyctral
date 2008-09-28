@@ -9,7 +9,7 @@ import numpy as _np
 # a and b. It is assumed that a and b are long enough to evaluate the max(n)-th
 # orthogonal polynomial. 
 # The output is a length(x) by length(n) array
-def eval_opoly(x,n,a,b) :
+def eval_opoly(x,n,a,b,d=0) :
 
     # Preprocessing: unravel x and n arrays
     x = _np.array(x)
@@ -18,12 +18,12 @@ def eval_opoly(x,n,a,b) :
     x = x.ravel()
     n = n.ravel()
 
-    p = _np.zeros([x.size, N+2]);
+    p = _np.zeros([x.size, N+2 d+1]);
 
-    p[:,0] = 1.;
+    p[:,0,0] = 1.;
     
     if N==0 :
-        return p[:,n]
+        return p[:,n,d]
 
     p[:,1] = p[:,0]*(x-a[0])
 
