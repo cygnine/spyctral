@@ -3,7 +3,9 @@
 #
 # 20080927 -- acn
 
-from eval_opoly import *
-# import jacobi
+from eval import *
+from quad import *
 
-print "Imported opoly1"
+__all__ = ['']
+__all__ += eval.__all__
+__all__ += quad.__all__
