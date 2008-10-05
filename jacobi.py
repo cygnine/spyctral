@@ -8,6 +8,7 @@ import numpy as _np
 import scipy.special as _nf
 #from opoly1 import eval_opoly, eval_opolyn, opoly_gq, opoly_grq, opoly_glq
 import opoly1
+import cheb1
 
 # Returns the first N Jacobi recurrence coefficients
 def recurrence(N,alpha=-1/2.,beta=-1/2.,shift=0,scale=1) :
@@ -53,17 +54,32 @@ def jpolyn(x,n,alpha=-1/2.,beta=-1/2.,d=0) :
 # Returns the N-point Jacobi-Gauss(a,b) quadrature rule over the interval
 # (-scale,scale)+shift
 def gquad(N,a=-1/2.,b=-1/2.,shift=0,scale=1) : 
-    [a_s,b_s] = recurrence(N,a,b,shift,scale)
-    return opoly1.opoly_gq(a_s,b_s,N)
+
+    tol = 1e-12;
+    if (abs(a+1/2.)<tol) & (abs(b+1/2.)<tol) :
+        return cheb1.gquad(N,shift,scale)
+    else :
+        [a_s,b_s] = recurrence(N,a,b,shift,scale)
+        return opoly1.opoly_gq(a_s,b_s,N)
 
 # Returns the N-point Jacobi-Gauss-Radau(a,b) quadrature rule over the interval
 # (-scale,scale)+shift
 def grquad(N,a=-1/2.,b=-1/2.,r0=-1.,shift=0,scale=1) : 
-    [a_s,b_s] = recurrence(N,a,b,shift,scale)
-    return opoly1.opoly_grq(a_s,b_s,N,r0=r0)
+
+    tol = 1e-12;
+    if (abs(a+1/2.)<tol) & (abs(b+1/2.)<tol) & (abs(r0)-1<tol) :
+        return cheb1.grquad(N,shift,scale)
+    else :
+        [a_s,b_s] = recurrence(N,a,b,shift,scale)
+        return opoly1.opoly_grq(a_s,b_s,N,r0=r0)
 
 # Returns the N-point Jacobi-Gauss-Lobatto(a,b) quadrature rule over the interval
 # (-scale,scale)+shift
 def glquad(N,a=-1/2.,b=-1/2.,r0=[-1.,1.],shift=0,scale=1) : 
-    [a_s,b_s] = recurrence(N,a,b,shift,scale)
-    return opoly1.opoly_glq(a_s,b_s,N,r0=r0)
+
+    tol = 1e-12;
+    if (abs(a+1/2.)<tol) & (abs(b+1/2.)<tol) :
+        return cheb1.glquad(N,shift,scale)
+    else :
+        [a_s,b_s] = recurrence(N,a,b,shift,scale)
+        return opoly1.opoly_glq(a_s,b_s,N,r0=r0)
