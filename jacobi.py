@@ -2,7 +2,8 @@
 # 
 # Functions for evaluation and quadrature of Jacobi polynomials
 
-__all__ = ['recurrence','jpoly','jpolyn','gquad']
+__all__ = ['recurrence','jpoly','jpolyn','gquad','glquad', 'grquad',
+        'gamma', 
 
 import numpy as _np
 import scipy.special as _nf
@@ -84,25 +85,4 @@ def glquad(N,a=-1/2.,b=-1/2.,r0=[-1.,1.],shift=0,scale=1) :
         [a_s,b_s] = recurrence(N,a,b,shift,scale)
         return opoly1.opoly_glq(a_s,b_s,N,r0=r0)
 
-# Returns the first N Jacobi gamma constants. These constants satisfy the
-# recurrence relation (1-r)*P_n^(a,b) = g(1)*P_(n+1)^(a-1,b) + g(2)*P_n^(a-1,b). 
-# Therefore the inputs must satisfy a>0, b>-1
-def gamma(N,a=1/2.,b=-1/2.) :
 
-    a = float(a)
-    b = float(b)
-    g = _np.zeros([N,2])
-    ns = _np.array(range(N))
-    tol = 1e-12
-
-    temp = 2*ns+a+b
-
-    if abs(a+b)<tol :
-        g[0,0] = (2.*a/(a+b+1.))**0.5
-        g[1:,0] = (2.*(ns[1:]+a)*(ns[1:]+a+b)/(temp[1:]*(temp[1:]+1.)))**0.5
-    else :
-        g[:,0] = (2.*(ns+a)*(ns+a+b)/(temp*(temp+1.)))**0.5
-
-    g[:,1] = (2.*(ns+1.)*(ns+b+1.)/((temp+1.)*(temp+2.)))**0.5
-
-    return g
