@@ -3,7 +3,7 @@
 # Functions for evaluation and quadrature of Jacobi polynomials
 
 __all__ = ['recurrence','jpoly','jpolyn','gquad','glquad', 'grquad',
-        'gamma', 
+        'gamma']
 
 import numpy as _np
 import scipy.special as _nf

@@ -96,8 +96,8 @@ def eval_opolyn(x,n,a,b,d=[0]) :
     if _np.size(d) > 1 :
         pr = []
         for q in d :
-            pr.append(p[:,:,q])
+            pr.append(p[:,n,q])
     else :
-        pr = p[:,:,d[0]]
+        pr = p[:,n,d[0]]
 
     return pr
