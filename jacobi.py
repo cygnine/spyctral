@@ -40,17 +40,17 @@ def recurrence(N,alpha=-1/2.,beta=-1/2.,shift=0,scale=1) :
 
 # Evaluates the monic Jacobi polynomials of class (alpha,beta), order n (list)
 # at the points x (list)
-def jpoly(x,n,alpha=-1/2.,beta=-1/2.,d=0) :
+def jpoly(x,n,alpha=-1/2.,beta=-1/2.,d=0, scale=1., shift=0.) :
     N = _np.max(n);
     [a,b] = recurrence(N+1,alpha,beta)
-    return opoly1.eval_opoly(x,n,a,b,d)
+    return opoly1.eval_opoly(x,n,a,b,d,scale,shift)
 
 # Evaluates the L^2-normalized Jacobi polynomials of class (alpha,beta), order n (list)
 # at the points x (list)
-def jpolyn(x,n,alpha=-1/2.,beta=-1/2.,d=0) :
+def jpolyn(x,n,alpha=-1/2.,beta=-1/2.,d=0,scale=1.,shift=0.) :
     N = _np.max(n);
     [a,b] = recurrence(N+2,alpha,beta)
-    return opoly1.eval_opolyn(x,n,a,b,d)
+    return opoly1.eval_opolyn(x,n,a,b,d,scale,shift)
 
 # Returns the N-point Jacobi-Gauss(a,b) quadrature rule over the interval
 # (-scale,scale)+shift

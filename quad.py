@@ -7,6 +7,7 @@ __all__ = ['opoly_gq', 'opoly_grq', 'opoly_glq']
 from numpy import array, sqrt, diag, dot
 from numpy.linalg import eigh, inv
 from opoly1 import eval_opoly
+import numpy as np
 #from scipy import sparse
 
 # Returns the N-point Gaussian quadrature associated by the orthogonal
@@ -35,7 +36,7 @@ def opoly_gq(a,b,N) :
 
     w = b[0]*(d[0,:]**2)
 
-    return [x,w]
+    return [x.reshape([N,1]),w.reshape([N,1])]
 
 # Returns the N-point Gauss-Radau quadrature associated with the orthogonal
 # polynomials defined by the recurrence constants a and b. The input r0 denotes

@@ -10,7 +10,7 @@ import numpy as _np
 # a and b. It is assumed that a and b are long enough to evaluate the max(n)-th
 # orthogonal polynomial. The d'th derivatives are evaluated. 
 # The output is a length(d)-list containing length(x) by length(n) arrays
-def eval_opoly(x,n,a,b,d=[0]) :
+def eval_opoly(x,n,a,b,d=[0],scale=1.,shift=0.) :
 
     # Preprocessing: unravel x and n arrays
     x = _np.array(x)
@@ -57,7 +57,7 @@ def eval_opoly(x,n,a,b,d=[0]) :
 # a and b. It is assumed that a and b are long enough to evaluate the max(n)-th
 # orthogonal polynomial. The d'th derivatives are evaluated. 
 # The output is a length(x) by length(n) by length(d) array
-def eval_opolyn(x,n,a,b,d=[0]) :
+def eval_opolyn(x,n,a,b,d=[0],scale=1.,shift=0.) :
 
     # Preprocessing: unravel x and n arrays
     x = _np.array(x)
