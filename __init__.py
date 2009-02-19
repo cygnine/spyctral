@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# Init file for opoly1 module
+# opoly1 module: evaluates all sorts of orthogonal polynomials
 #
 # 20080927 -- acn
 

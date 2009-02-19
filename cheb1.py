@@ -2,7 +2,7 @@
 #
 # Module for the Chebyshev polynomials: extensively uses the Jacobi module
 
-__all__ = ['poly', 'polyn', 'gquad', 'grquad', 'glquad']
+__all__ = ['poly', 'polyn', 'gquad', 'grquad', 'glquad','chebfft']
 import jacobi
 from numpy import ones, linspace, cos, vstack, array, matrix, exp, sqrt
 from numpy.fft import rfft
@@ -27,12 +27,12 @@ def polyn(x,n,shift=0.,scale=1.) :
 # (-scale, scale) + shift
 def gquad(N,shift=0.,scale=1.) :
 
-    w = scale*pi/float(N)*ones([N,1])
+    w = scale*pi/float(N)*ones([N])
 
     temp = linspace(pi,0,N+1)
     x = scale*cos(temp[:N]-pi/(2.*N)) + shift
 
-    return [x.reshape([N,1]), w.reshape([N,1])]
+    return [x, w]
 
 # Returns the N-point Chebyshev-Gauss-Lobatto quadrature shifted to the interval
 # (-scale,scale)+shift
@@ -45,7 +45,7 @@ def glquad(N,shift=0.,scale=1.) :
     temp = linspace(pi,0,N)
     x = scale*cos(temp[:N]) + shift
 
-    return [x.reshape([N,1]),w.reshape([N,1])]
+    return [x,w]
 
 # Returns the N-point Chebyshev-Gauss-Radau quadrature shifted to the interval
 # (-scale,scale)+shift. The default fixed point is at r0 = -1. NOTE: This cannot
@@ -63,7 +63,7 @@ def grquad(N,r0=-1.,shift=0.,scale=1.) :
         x = -x[N::-1]
         w = w[N::-1]
 
-    return [x.reshape([N,1]),w.reshape([N,1])]
+    return [x,w]
 
 # Uses the FFT to compute the Chebyshev modes for the normalized polynomials
 # for nodal points for the Chebyshev-Gauss type. Only works along rows right now

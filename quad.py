@@ -55,6 +55,7 @@ def opoly_grq(a,b,N,r0=-1.) :
         N = Ntmp;
 
     # Same as doing Gauss quadrature with a modified recurrence relation
+    #temp = eval_opoly(r0,[N-2, N-1],a,b).squeeze()
     temp = eval_opoly(r0,[N-2, N-1],a,b).squeeze()
     a[N-1] = r0 - b[N-1]*temp[0]/temp[1]
 
