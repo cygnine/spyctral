@@ -1,5 +1,5 @@
 # Module for defining the evaluation of the generalized Fourier functions
-
+# THIS IS A TEST MODULE: USED FOR DETERMINING NORMALIZATION CONSTANTS 
 __all__ = ['genfourier',
            'genfourierw']
 
@@ -8,6 +8,13 @@ import scipy as _sp
 from scipy import pi
 
 import opoly1.jacobi as jac
+
+# Defines normalization coefficients for the Szego-Fourier functions
+def ck(k,g=0.,d=0.):
+    return _np.ones(k.size)
+
+def dk(k,g=0.,d=0.):
+    return _np.ones(k.size)
 
 # Evaluates the generalized Szego-Fourier functions at the locations theta \in 
 # [-pi,pi]. This function mods the inputs theta to lie in this interval and then
@@ -19,8 +26,6 @@ def genfourier(theta,k,g=0.,d=0.):
     theta = _np.array(theta)
     theta = theta.ravel()
     theta = (theta+pi) % (2*pi) - pi
-    if type(k) != (_np.ndarray or list):
-        k = [k]
     k = _np.array(k,dtype='int')
     k = k.ravel()
     kneq0 = k != 0
@@ -28,29 +33,22 @@ def genfourier(theta,k,g=0.,d=0.):
     r = _np.cos(theta)
 
     # Evaluate polynomials and multiplication factors
-    p1 = jac.jpolyn(r,_np.abs(k),d-1/2.,g-1/2.).reshape([theta.size,k.size])
-    #p2 = jac.jpolyn(r,_np.abs(k[kneq0])-1,d+1/2.,g+1/2.)
-    #kmat = _np.diag(_np.sign(k[kneq0]))
-    #tmat = _np.diag(_np.sin(theta))
-    #p2 = 1j*_np.dot(_np.dot(tmat,p2),kmat)
+    p1 = jac.jpolyn(r,_np.abs(k),d-1/2.,g-1/2.)
+    p1 *= ck(k)
 
     # Add things together
     Psi = _np.zeros([theta.size,k.size],dtype='complex128')
     Psi[:,~kneq0] = 1/_np.sqrt(2)*p1[:,~kneq0]
-    #Psi[:,kneq0] = 1./2.*(p1[:,kneq0] + p2)
 
     if k[kneq0].any():
-        p2 = jac.jpolyn(r,_np.abs(k[kneq0])-1,d+1/2.,g+1/2.).\
-                reshape([theta.size,k[kneq0].size])
-        #kmat = _np.diag(_np.sign(k[kneq0]))
-        kmat = _np.sign(k[kneq0])
-        #tmat = _np.diag(_np.sin(theta))
-        tmat = _np.sin(theta)
-        p2 = 1j*(p2.T*tmat).T*kmat
-        #p2 = 1j*_np.dot(_np.dot(tmat,p2),kmat)
+        p2 = jac.jpolyn(r,_np.abs(k[kneq0])-1,d+1/2.,g+1/2.)
+        kmat = _np.diag(_np.sign(k[kneq0]))
+        tmat = _np.diag(_np.sin(theta))
+        p2 = 1j*_np.dot(_np.dot(tmat,p2),kmat)
+        p2 *= dk(k[kneq0])
         Psi[:,kneq0] = 1./2.*(p1[:,kneq0] + p2)
 
-    return Psi.squeeze()
+    return Psi
 
 # Evaluates the derivative of the generalized Szego-Fourier functions at the locations theta \in 
 # [-pi,pi]. This function mods the inputs theta to lie in this interval and then
@@ -76,6 +74,7 @@ def dgenfourier(theta,k,g=0.,d=0.):
     dPsi += 1/2.*jac.djpolyn(r,_np.abs(k),a,b)
     dPsi = _np.dot(_np.diag(-_np.sin(theta)),dPsi)
     dPsi[:,~kneq0] *= _np.sqrt(2)
+    dPsi *= ck(k)
 
     # Now the odd term:
     if _np.any(kneq0):
@@ -84,6 +83,7 @@ def dgenfourier(theta,k,g=0.,d=0.):
         ####term2 += _np.dot(_np.diag(-_np.sin(theta)**2),jac.jpolyn(r,_np.abs(k[kneq0])-1,a+1,b+1,d=1))
         term2 += _np.dot(_np.diag(-_np.sin(theta)**2),jac.djpolyn(r,_np.abs(k[kneq0])-1,a+1,b+1))
         term2 = 1./2*_np.dot(term2,_np.diag(1j*_np.sign(k[kneq0])))
+        term2 *= dk(k[kneq0])
     else:
         term2 = 0.
 
