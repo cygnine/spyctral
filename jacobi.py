@@ -14,6 +14,8 @@ import cheb1
 # Returns the first N Jacobi recurrence coefficients
 def recurrence(N,alpha=-1/2.,beta=-1/2.,shift=0,scale=1) :
 
+    from opoly1.eval import recurrence_scaleshift
+
     alpha = float(alpha)
     beta = float(beta)
     a_s = (beta**2-alpha**2)*_np.ones([N])
@@ -33,12 +35,14 @@ def recurrence(N,alpha=-1/2.,beta=-1/2.,shift=0,scale=1) :
             den =  (2*k+alpha+beta)**2*(2*k+alpha+beta+1)*(2*k+alpha+beta-1)
             b_s[k] = num/den
 
-    return [a_s,b_s]
+    return recurrence_scaleshift([a_s,b_s],scale=scale,shift=shift)
         
     # Still have recurrence_scaleshift to deal with
 
 # Returns recurrence coefficients for certain values of n
 def recurrence_ns(ns,alpha=-1/2.,beta=-1/2.,shift=0,scale=1) :
+
+    from opoly1.eval import recurrence_scaleshift
 
     ns = _np.array(ns)
     N = ns.size
@@ -63,23 +67,23 @@ def recurrence_ns(ns,alpha=-1/2.,beta=-1/2.,shift=0,scale=1) :
             b_s[count] = num/den
         count += 1
 
-    return [a_s,b_s]
+    return recurrence_scaleshift([a_s,b_s],scale=scale,shift=shift)
 
 
 # Evaluates the monic Jacobi polynomials of class (alpha,beta), order n (list)
 # at the points x (list)
 def jpoly(x,n,alpha=-1/2.,beta=-1/2.,d=0, scale=1., shift=0.) :
     N = _np.max(n);
-    [a,b] = recurrence(N+1,alpha,beta)
-    return opoly1.eval_opoly(x,n,a,b,d,scale,shift)
+    [a,b] = recurrence(N+1,alpha,beta,scale=scale,shift=shift)
+    return opoly1.eval_opoly(x,n,a,b,d)
 
 # Evaluates the L^2-normalized Jacobi polynomials of class (alpha,beta), order n (list)
 # at the points x (list)
 def jpolyn(x,n,alpha=-1/2.,beta=-1/2.,d=0,scale=1.,shift=0.) :
     n = _np.array(n)
     N = _np.max(n);
-    [a,b] = recurrence(N+2,alpha,beta)
-    return opoly1.eval_opolyn(x,n,a,b,d,scale,shift)
+    [a,b] = recurrence(N+2,alpha,beta,scale=scale,shift=shift)
+    return opoly1.eval_opolyn(x,n,a,b,d)
 
 # Temporary function to evaluate Jacobi derivatives
 def djpolyn(x,n,alpha=-1/2.,beta=-1/2.):
@@ -114,12 +118,14 @@ def grquad(N,a=-1/2.,b=-1/2.,r0=-1.,shift=0,scale=1) :
 # (-scale,scale)+shift
 def glquad(N,a=-1/2.,b=-1/2.,r0=[-1.,1.],shift=0,scale=1) : 
 
+    from numpy import array
+    r0 = array(r0)
     tol = 1e-12;
     if (abs(a+1/2.)<tol) & (abs(b+1/2.)<tol) :
         return cheb1.glquad(N,shift,scale)
     else :
-        [a_s,b_s] = recurrence(N,a,b,shift,scale)
-        return opoly1.opoly_glq(a_s,b_s,N,r0=r0)
+        [a_s,b_s] = recurrence(N,a,b,shift=shift,scale=scale)
+        return opoly1.opoly_glq(a_s,b_s,N,r0=(r0*scale+shift))
 
 ########################################################
 #                 HELPER FUNCTIONS                     #
@@ -174,7 +180,7 @@ def epsilonn(n,alpha=1/2.,beta=1/2.):
     epsn[:,2] = -_np.sqrt(4*(n+1)*(n+2)*(n+a+1)*(n+b+1)/ \
                            ((2*n+a+b+1)*(2*n+a+b+2)**2*(2*n+a+b+3)))
     
-    return epsn
+    return epsn.squeeze()
 
 # Coefficients for expanding (a,b) polynomial to (a+1,b+1) polynomial
 # P_n^(a,b) = h_2*P_n^(a+1,b+1) + h_1*P_{n-1}^(a+1,b+1) + h_0*P_{n-2}^(a+1,b+1)

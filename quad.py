@@ -36,7 +36,7 @@ def opoly_gq(a,b,N) :
 
     w = b[0]*(d[0,:]**2)
 
-    return [x.reshape([N,1]),w.reshape([N,1])]
+    return [x,w]
 
 # Returns the N-point Gauss-Radau quadrature associated with the orthogonal
 # polynomials defined by the recurrence constants a and b. The input r0 denotes

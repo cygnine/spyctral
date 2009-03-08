@@ -6,11 +6,27 @@ __all__ = ['eval_opoly', 'eval_opolyn']
 
 import numpy as _np
 
+# Almost all information about a family of orthogonal polynomials can
+# be derived from the recurrence relation. Therefore, when doing
+# affine rescalings of the real line, we'll just modify the recurrence
+# coefficients: it makes life easier to hide this flexibility in the
+# abstraction of the recurrence.
+# Shift = linear shift (relative to 0)
+# Scale = represenative length scale (relative to 1)
+# x ------> w = x/scale + shift
+def recurrence_scaleshift(ab,shift=0.,scale=1.):
+    # a = shift + a*scale
+    ab[0] *= scale
+    ab[0] += shift
+    # b = b*(scale**2)
+    ab[1] *= scale**2
+    return ab
+
 # Evaluates the monic orthogonal polynomials at x defined by the recurrence constants
 # a and b. It is assumed that a and b are long enough to evaluate the max(n)-th
 # orthogonal polynomial. The d'th derivatives are evaluated. 
 # The output is a length(d)-list containing length(x) by length(n) arrays
-def eval_opoly(x,n,a,b,d=[0],scale=1.,shift=0.) :
+def eval_opoly(x,n,a,b,d=[0]):
 
     # Preprocessing: unravel x and n arrays
     x = _np.array(x)
@@ -19,6 +35,9 @@ def eval_opoly(x,n,a,b,d=[0],scale=1.,shift=0.) :
     D = _np.max(d)
     x = x.ravel()
     n = n.ravel()
+
+    # This step should be done before calling this function
+    #[a,b] = recurrence_scaleshift([a,b],scale=scale,shift=shift)
 
     # Cast int d as list
     if type(d) != list :
@@ -57,7 +76,7 @@ def eval_opoly(x,n,a,b,d=[0],scale=1.,shift=0.) :
 # a and b. It is assumed that a and b are long enough to evaluate the max(n)-th
 # orthogonal polynomial. The d'th derivatives are evaluated. 
 # The output is a length(x) by length(n) by length(d) array
-def eval_opolyn(x,n,a,b,d=[0],scale=1.,shift=0.) :
+def eval_opolyn(x,n,a,b,d=[0]):
 
     # Preprocessing: unravel x and n arrays
     x = _np.array(x)
@@ -66,6 +85,9 @@ def eval_opolyn(x,n,a,b,d=[0],scale=1.,shift=0.) :
     D = _np.max(d)
     x = x.ravel()
     n = n.ravel()
+
+    # This step should be done before calling this function
+    #[a,b] = recurrence_scaleshift([a,b],scale=scale,shift=shift)
 
     if N<0:
         N = 0
