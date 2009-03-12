@@ -50,6 +50,8 @@ def genfourier_gquad(N,g=0.,d=0.):
         r = r.squeeze()
         wr = wr.squeeze()
         temp = _np.arccos(r[::-1])
+        # Silly arccos machine epsilson crap
+        temp[_np.isnan(temp)] = 0.
         theta = _np.hstack((-temp[::-1],temp[1:]))
         wr = wr[::-1]
         wr[0] *= 2

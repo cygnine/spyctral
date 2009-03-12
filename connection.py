@@ -58,3 +58,34 @@ def c_expand(modes,N):
 def s_expand(modes,N):
     factor = modes.size - (1+(-1)**N)/2
     return _np.hstack((-modes[::-1],_np.array([0.]),modes[:factor]))
+
+# Returns the necessary matrices for performing the int_connection; use
+# as an overhead to plug into int_connection_online.
+def int_connection_overhead(N,g,d,G,D):
+    from jfft import rmatrix_entries as jconnection_entries
+    G = int(G)
+    D = int(D)
+
+    cmodes = jconnection_entries((N+2)/2,d-1/2.,g-1/2.,D,G)
+    smodes = jconnection_entries(N/2,d+1/2.,g+1/2.,D,G)
+
+    return [cmodes,smodes]
+
+# Applies the connection matrices returned by int_connection_overhead to
+# perform the fft.
+def int_connection_online(modes,matrices):
+    from jfft import rmatrix_entries_apply as jconnection_apply
+
+    if matrices[0].shape[1]>1:
+        N = modes.shape[0]
+
+        modes *= 1/2.
+        cmodes = c_collapse(modes,N)
+        smodes = s_collapse(modes,N)
+
+        cmodes = jconnection_apply(cmodes,matrices[0])
+        smodes = jconnection_apply(smodes,matrices[1])
+
+        return c_expand(cmodes,N) + s_expand(smodes,N)
+    else: 
+        return modes
