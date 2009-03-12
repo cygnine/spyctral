@@ -3,6 +3,8 @@
 # Module for doing modal-nodal transformations for cardinal Whittaker
 # splines
 
+__all__ = []
+
 # Given a function f, output N modes. If N is even, bias is to the
 # left (negative).
 def get_N_modes_from_function(f,N,Q='sinc',shift=0.,scale=1.):
@@ -30,7 +32,7 @@ def get_ks_modes_from_function(f,ks,s=1.,t=0.,Q='wf',shift=0.,scale=1.):
 
     ps = genwienerw(x,ks,s=s,t=t,shift=shift,scale=scale)
 
-    return dot(ps.T*w,f(x))
+    return dot(ps.T.conj()*w,f(x))
 
 # Given the modes associated with indices ks, return a function that
 # evaluates the interpolant.

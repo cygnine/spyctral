@@ -10,6 +10,9 @@ __all__ = ['genwiener_gquad',
            'fft',
            'wfft']
 
+def quad(N,s=1.,t=0.,shift=0.,scale=1.):
+    return genwienerw_pgquad(N,s=s,t=t,shift=shift,scale=scale)
+
 # Returns N k-indices, using the default standard bias (to the
 # left/negative if N is even)
 def N_to_ks(N):
