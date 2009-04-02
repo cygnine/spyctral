@@ -9,6 +9,22 @@ __all__ = ['gquad',
 import numpy as _np
 from scipy import pi
 
+# Returns N k-indices, using the default standard bias (to the
+# left/negative if N is even)
+def N_to_ks(N):
+
+    from numpy import arange
+
+    N = int(N)
+    if bool(N%2):
+        N = (N-1)/2
+        ks = arange(-N,N+1)
+    else:
+        N = N/2
+        ks = arange(-N,N)
+
+    return ks
+
 # Returns the default Fourier quadrature rule over the interval (-pi*scale,
 # pi*scale) + shift
 def gquad(N,scale=0.,shift=0.) :
