@@ -97,7 +97,7 @@ def genwiener_stiff_entries(ks,s=1.,t=0.):
 
 # Returns constants for the weighted Wiener function stiffness matrix
 # Each row contains six columns: kvee, -kvee, k, -k, kwedge, -kwedge
-def genwienerw_stiff_entries(ks,s=1.,t=0.):
+def genwienerw_stiff_entries(ks,s=1.,t=0.,scale=1.):
 
     from numpy import sign as sgn
     from numpy import sqrt
@@ -149,12 +149,12 @@ def genwienerw_stiff_entries(ks,s=1.,t=0.):
 
         kcount += 1
 
-    return entries
+    return entries/scale
 
 # Generates the NxN stiffness matrix for weighted Wiener functions (for N even,
 # the indices are negatively-biased)
 # Returns a sparse CSR matrix
-def genwienerw_stiff(N,s,t):
+def genwienerw_stiff(N,s=1.,t=0.,scale=1.):
 
     #from numpy import sign as sgn
     from scipy import sparse
@@ -172,7 +172,7 @@ def genwienerw_stiff(N,s,t):
         ks = range(-k,k)
         kbottom = -k
 
-    entries = genwienerw_stiff_entries(ks,s,t)
+    entries = genwienerw_stiff_entries(ks,s,t,scale=scale)
     I = []
     J = []
     V = []
@@ -211,3 +211,27 @@ def genwienerw_stiff(N,s,t):
     # column indices, and the J's are row indices
     return sparse.coo_matrix((V,(J,I)),dims=(N,N)).tocsr()
     #return [rowks,colks,es]
+
+# Function that calculates overhead for applying the 
+# stiffness matrix for the weighted Wiener rational functions. The
+# coefficients should be the output of genwienerw_stiff_entries.
+def apply_stiff_entries_overhead(N,s=1.,t=0.,scale=1.):
+
+    print """This function is not supported due to the efficiency of the CSR
+    matvec routine in scipy. genwienerw_stiff() returns a CSR
+    representation of the stiffness matrix"""
+
+    from wienerfun.quad import N_to_ks
+    ks = N_to_ks(N)
+
+    # Generate the coefficients
+    entries = genwienerw_stiff_entries(ks,s=s,t=t,scale=scale)
+
+    # Generate necessary maps to appl
+    if entries.size[0] != N:
+        print """Error: inputs f and coefficients must have the same
+               number of rows"""
+
+    ######## INCOMPLETE: does built-in CSR multiplication do better?
+    # For N = 1000, .matvec() routine does things ~ 40 times faster than
+    # numpy.dot, so I'm abandoning this routine for now

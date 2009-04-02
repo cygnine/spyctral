@@ -64,6 +64,7 @@ def genwienerw(x,k,s=1.,t=0.,shift=0.,scale=1.):
 # Evaluates the derivative of the orthonormalized weighted Wiener rational functions
 def dgenwienerw(x,k,s=1.,t=0.,shift=0.,scale=1.):
 
+    from numpy import sqrt
     from fourier.genfourier import genfourier, dgenfourier
     from maps import dthetadx
 
@@ -82,7 +83,7 @@ def dgenwienerw(x,k,s=1.,t=0.,shift=0.,scale=1.):
     # Second term: d/dx wx_sqrt * Phi
     psi += (dwx_sqrt(x,s,t,shift=shift,scale=scale)*genfourier(theta,k,s-1.,t).T).T
 
-    return psi/scale
+    return psi/sqrt(scale)
 
 # Evaluates the weight function
 def wx(x,s=1.,t=0.,shift=0.,scale=1.):
