@@ -40,9 +40,11 @@ def gquad(N,scale=0.,shift=0.) :
 # The rules are constructed for the unweighted functions, and with the intent
 # that they will eventually be mapped to the real line so that we try not to
 # place nodes at x=\pm\pi
-def genfourier_gquad(N,g=0.,d=0.):
+def genfourier_gquad(N,g=0.,d=0.,shift=0.,scale=1.):
 
     from opoly1 import jacobi as jac
+    from spectral_common import forward_scaleshift as fss
+    from spectral_common import backward_scaleshift as bss
 
     N = int(N)
     tol = 1e-8
@@ -58,6 +60,7 @@ def genfourier_gquad(N,g=0.,d=0.):
         wr = wr[::-1]
         theta = _np.hstack((-temp[::-1],temp))
         w = _np.hstack((wr[::-1],wr))
+        bss(theta,scale=scale,shift=shift)
         return [theta,w]
 
     else:
@@ -66,20 +69,21 @@ def genfourier_gquad(N,g=0.,d=0.):
         r = r.squeeze()
         wr = wr.squeeze()
         temp = _np.arccos(r[::-1])
-        # Silly arccos machine epsilson crap
+        # Silly arccos machine epsilon crap
         temp[_np.isnan(temp)] = 0.
         theta = _np.hstack((-temp[::-1],temp[1:]))
         wr = wr[::-1]
         wr[0] *= 2
         w = _np.hstack((wr[::-1],wr[1:]))
+        bss(theta,scale=scale,shift=shift)
         return [theta,w]
 
 # Returns the Szego-Fourier quadrature for the weighted functions
-def genfourierw_pgquad(N,g=0.,d=0.):
+def genfourierw_pgquad(N,g=0.,d=0.,shift=0.,scale=1.):
 
     from fourier.genfourier import wtheta
-    [theta,w] = genfourier_gquad(N,g,d)
-    return [theta,w/wtheta(theta,g,d)]
+    [theta,w] = genfourier_gquad(N,g,d,shift=shift,scale=scale)
+    return [theta,w/wtheta(theta,g,d,shift=shift,scale=scale)*scale]
 
 # Returns the modes of the input numpy array along the axis 0 assuming that the
 # nodal values are at the Szego-Fourier quadrature points. Returns modes for the
