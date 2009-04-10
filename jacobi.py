@@ -35,7 +35,10 @@ def recurrence(N,alpha=-1/2.,beta=-1/2.,shift=0,scale=1) :
             den =  (2*k+alpha+beta)**2*(2*k+alpha+beta+1)*(2*k+alpha+beta-1)
             b_s[k] = num/den
 
-    return recurrence_scaleshift([a_s,b_s],scale=scale,shift=shift)
+    # Deprecate recurrence_scaleshift: easier to just do affine
+    # transformations
+    #return recurrence_scaleshift([a_s,b_s],scale=scale,shift=shift)
+    return [a_s,b_s]
         
     # Still have recurrence_scaleshift to deal with
 
@@ -67,23 +70,52 @@ def recurrence_ns(ns,alpha=-1/2.,beta=-1/2.,shift=0,scale=1) :
             b_s[count] = num/den
         count += 1
 
-    return recurrence_scaleshift([a_s,b_s],scale=scale,shift=shift)
+    # Deprecate recurrence_scaleshift: easier to just do affine
+    # transformations
+    #return recurrence_scaleshift([a_s,b_s],scale=scale,shift=shift)
+    return [a_s,b_s]
 
 
 # Evaluates the monic Jacobi polynomials of class (alpha,beta), order n (list)
 # at the points x (list)
 def jpoly(x,n,alpha=-1/2.,beta=-1/2.,d=0, scale=1., shift=0.) :
+    from numpy import arange
+    from spectral_common import forward_scaleshift as fss
+    from spectral_common import backward_scaleshift as bss
     N = _np.max(n);
-    [a,b] = recurrence(N+1,alpha,beta,scale=scale,shift=shift)
-    return opoly1.eval_opoly(x,n,a,b,d)
+    [a,b] = recurrence(N+1,alpha,beta)
+
+    # Shift to standard interval and use opoly 3-term recurrence
+    fss(x,scale=scale,shift=shift)
+    temp = opoly1.eval_opoly(x,n,a,b,d)
+    bss(x,scale=scale,shift=shift)
+
+    # Scale appropriately (monic is baaaad if scale is large)
+    temp = temp*(scale**arange(N))
+    
+    return temp
 
 # Evaluates the L^2-normalized Jacobi polynomials of class (alpha,beta), order n (list)
 # at the points x (list)
 def jpolyn(x,n,alpha=-1/2.,beta=-1/2.,d=0,scale=1.,shift=0.) :
+
+    from numpy import arange,sqrt
+    from spectral_common import forward_scaleshift as fss
+    from spectral_common import backward_scaleshift as bss
+
     n = _np.array(n)
     N = _np.max(n);
-    [a,b] = recurrence(N+2,alpha,beta,scale=scale,shift=shift)
-    return opoly1.eval_opolyn(x,n,a,b,d)
+    [a,b] = recurrence(N+2,alpha,beta)
+
+    # Shift to standard interval and use opoly 3-term recurrence
+    fss(x,scale=scale,shift=shift)
+    temp = opoly1.eval_opolyn(x,n,a,b,d)
+    bss(x,scale=scale,shift=shift)
+
+    # Scale appropriately
+    temp /= sqrt(scale)
+
+    return temp
 
 # Temporary function to evaluate Jacobi derivatives
 def djpolyn(x,n,alpha=-1/2.,beta=-1/2.):
@@ -94,38 +126,61 @@ def djpolyn(x,n,alpha=-1/2.,beta=-1/2.):
 
 # Returns the N-point Jacobi-Gauss(a,b) quadrature rule over the interval
 # (-scale,scale)+shift
-def gquad(N,a=-1/2.,b=-1/2.,shift=0,scale=1) : 
+# The quadrature rule is normalized to reflect the real Jacobian
+def gquad(N,a=-1/2.,b=-1/2.,shift=0.,scale=1.) : 
+    from spectral_common import backward_scaleshift as bss
 
     tol = 1e-12;
     if (abs(a+1/2.)<tol) & (abs(b+1/2.)<tol) :
-        return cheb1.gquad(N,shift,scale)
+        return cheb1.gquad(N,shift=shift,scale=scale)
     else :
-        [a_s,b_s] = recurrence(N,a,b,shift,scale)
-        return opoly1.opoly_gq(a_s,b_s,N)
+        [a_s,b_s] = recurrence(N,a,b)
+        temp = opoly1.opoly_gq(a_s,b_s,N)
+        temp[1] *= scale
+        bss(temp[0],scale=scale,shift=shift)
+        return temp
 
 # Returns the N-point Jacobi-Gauss-Radau(a,b) quadrature rule over the interval
 # (-scale,scale)+shift
 def grquad(N,a=-1/2.,b=-1/2.,r0=-1.,shift=0,scale=1) : 
+    from spectral_common import forward_scaleshift as fss
+    from spectral_common import backward_scaleshift as bss
 
     tol = 1e-12;
     if (abs(a+1/2.)<tol) & (abs(b+1/2.)<tol) & (abs(abs(r0)-1.)<tol) :
         return cheb1.grquad(N,r0=r0,shift=shift,scale=scale)
     else :
         [a_s,b_s] = recurrence(N,a,b,shift,scale)
-        return opoly1.opoly_grq(a_s,b_s,N,r0=r0)
+        fss(r0,scale=scale,shift=shift)
+        temp = opoly1.opoly_gq(a_s,b_s,N,r0=r0)
+        bss(r0,scale=scale,shift=shift)
+        bss(temp[0],scale=scale,shift=shift)
+        temp[1] *= scale
+        return temp
 
 # Returns the N-point Jacobi-Gauss-Lobatto(a,b) quadrature rule over the interval
 # (-scale,scale)+shift
-def glquad(N,a=-1/2.,b=-1/2.,r0=[-1.,1.],shift=0,scale=1) : 
+def glquad(N,a=-1/2.,b=-1/2.,r0=False,shift=0.,scale=1.) : 
+    from spectral_common import forward_scaleshift as fss
+    from spectral_common import backward_scaleshift as bss
 
     from numpy import array
+
+    if type(r0)==bool:
+        r0 = [-scale,scale]
+
     r0 = array(r0)
     tol = 1e-12;
     if (abs(a+1/2.)<tol) & (abs(b+1/2.)<tol) :
         return cheb1.glquad(N,shift,scale)
     else :
-        [a_s,b_s] = recurrence(N,a,b,shift=shift,scale=scale)
-        return opoly1.opoly_glq(a_s,b_s,N,r0=(r0*scale+shift))
+        [a_s,b_s] = recurrence(N,a,b)
+        fss(r0,scale=scale,shift=shift)
+        temp = opoly1.opoly_glq(a_s,b_s,N,r0=r0)
+        bss(r0,scale=scale,shift=shift)
+        bss(temp[0],scale=scale,shift=shift)
+        temp[1] *= scale
+        return temp
 
 ########################################################
 #                 HELPER FUNCTIONS                     #

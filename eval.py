@@ -18,8 +18,9 @@ def recurrence_scaleshift(ab,shift=0.,scale=1.):
     # a = shift + a*scale
     ab[0] *= scale
     ab[0] += shift
-    # b = b*(scale**2)
-    ab[1] *= scale**2
+    # b = b*(scale**2) (except b[0] = b[0]*scale, which is the Jacobian)
+    ab[1][1:] *= scale**2
+    ab[1][0] /= scale
     return ab
 
 # Evaluates the monic orthogonal polynomials at x defined by the recurrence constants
@@ -61,7 +62,7 @@ def eval_opoly(x,n,a,b,d=[0]):
         for qq in range(D+1) :
             p[:,q+2,qq] = (x-a[q+1])*p[:,q+1,qq] - b[q+1]*p[:,q,qq]
             if qq>0 :  # Correction for evaluation of derivatives
-                p[:,q+2,qq] = p[:,q+2,qq] + qq*p[:,q+1,qq-1]
+                p[:,q+2,qq] += qq*p[:,q+1,qq-1]
 
     if _np.size(d) > 1 :
         pr = []
@@ -82,7 +83,7 @@ def eval_opolyn(x,n,a,b,d=[0]):
     x = _np.array(x)
     n = _np.array(n,dtype='int')
     N = _np.round(_np.max(n))
-    D = _np.max(d)
+    D = int(_np.max(d))
     x = x.ravel()
     n = n.ravel()
 
@@ -111,15 +112,15 @@ def eval_opolyn(x,n,a,b,d=[0]):
     # Initial conditions for the recurrence relation, N=1
     p[:,1,0] = 1./(b[1]**(1/2.))*p[:,0,0]*(x-a[0])
     if D > 0 :
-        p[:,1,1] = p[:,0,0]
+        p[:,1,1] = p[:,0,0]/(b[1]**(1/2.))
 
     for q in range(N) :
         for qq in range(D+1) :
             p[:,q+2,qq] = (x-a[q+1])*p[:,q+1,qq] - (b[q+1]**(1/2.))*p[:,q,qq]
             if qq>0 :  # Correction for evaluation of derivatives
-                p[:,q+2,qq] = p[:,q+2,qq] + qq*p[:,q+1,qq-1]
+                p[:,q+2,qq] += qq*p[:,q+1,qq-1]
 
-            p[:,q+2,qq] = 1/(b[q+2]**(1/2.))*p[:,q+2,qq]
+            p[:,q+2,qq] /= (b[q+2]**(1/2.))
 
 
     if _np.size(d) > 1 :
