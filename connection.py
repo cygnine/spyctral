@@ -21,13 +21,34 @@ def int_connection(modes,g,d,G,D):
 
         N = modes.shape[0]
 
-        modes *= 1/2.
-        cmodes = c_collapse(modes,N)
-        smodes = s_collapse(modes,N)
+        cmodes = c_collapse(modes,N)*1/2.
+        smodes = s_collapse(modes,N)*1/2.
 
         cmodes = jconnection(cmodes,d-1/2.,g-1/2.,D,G)
         smodes = jconnection(smodes,d+1/2.,g+1/2.,D,G)
 
+        return c_expand(cmodes,N) + s_expand(smodes,N)
+    else:
+        return modes
+
+# Reverses the integer connection performed by int_connection
+# The input modes is a vector of (g+G,d+D) modes, and we wish to demote
+# them back to (g,d) modes.
+def int_connection_backward(modes,g,d,G,D):
+
+    from jfft import rmatrix_invert as jconnection_inv
+    G = int(G)
+    D = int(D)
+    if (G+D)>0:
+
+        N = modes.size
+
+        cmodes = c_collapse(modes,N)*1/2.
+        smodes = s_collapse(modes,N)*1/2.
+
+        cmodes = jconnection_inv(cmodes,d-1/2.,g-1/2.,D,G)
+        smodes = jconnection_inv(smodes,d+1/2.,g+1/2.,D,G)
+        
         return c_expand(cmodes,N) + s_expand(smodes,N)
     else:
         return modes
@@ -75,6 +96,23 @@ def int_connection_overhead(N,g,d,G,D):
 # perform the fft.
 def int_connection_online(modes,matrices):
     from jfft import rmatrix_entries_apply as jconnection_apply
+
+    if matrices[0].shape[1]>1:
+        N = modes.shape[0]
+
+        modes *= 1/2.
+        cmodes = c_collapse(modes,N)
+        smodes = s_collapse(modes,N)
+
+        cmodes = jconnection_apply(cmodes,matrices[0])
+        smodes = jconnection_apply(smodes,matrices[1])
+
+        return c_expand(cmodes,N) + s_expand(smodes,N)
+    else: 
+        return modes
+
+def int_connection_backward_online(modes,matrices):
+    from jfft import rmatrix_entries_invert as jconnection_apply
 
     if matrices[0].shape[1]>1:
         N = modes.shape[0]

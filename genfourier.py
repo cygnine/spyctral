@@ -100,7 +100,7 @@ def dgenfourier(theta,k,g=0.,d=0.,shift=0.,scale=1.):
 
     # Transform theta back to original interval
     bss(theta,shift=shift,scale=scale)
-    return dPsi
+    return dPsi/scale
 
 # Evaluates the generalized weighted Szego-Fourier functions at the locations theta \in 
 # [-pi,pi]. This function mods the inputs theta to lie in this interval and then
@@ -127,6 +127,18 @@ def genfourierw(theta,k,g=0.,d=0.,shift=0.,scale=1.):
     # Scaling:
     return phi/sqrt(scale)
 
+# Evaluates the derivative of the shift/scaled weighted generalized
+# Fourier functions. 
+def dgenfourierw(theta,ks,g=0.,d=0.,shift=0.,scale=1.):
+    from numpy import sqrt
+
+    w = wtheta_sqrt(theta,g=g,d=d,scale=scale,shift=shift)
+    dw = dwtheta_sqrt(theta,g=g,d=d,scale=scale,shift=shift)
+    Psi = genfourier(theta,ks,g=g,d=d,scale=scale,shift=shift)
+    dPsi = dgenfourier(theta,ks,g=g,d=d,scale=scale,shift=shift)
+
+    return (dw*Psi.T + w*dPsi.T).T/sqrt(scale)
+
 # Defines the regular square root of the Szego-Fourier weight
 def wtheta(theta,g=0.,d=0.,shift=0.,scale=1.):
     from numpy import array
@@ -143,10 +155,15 @@ def wtheta(theta,g=0.,d=0.,shift=0.,scale=1.):
 def wtheta_sqrt(theta,g=0.,d=0.,shift=0.,scale=1.):
     from spectral_common import forward_scaleshift as fss
     from spectral_common import backward_scaleshift as bss
+    from scipy import power as pw
+    from numpy import exp, sin, cos
 
     fss(theta,scale=scale,shift=shift)
-    phase = _np.exp(1j*(g+d)/2.*(pi-theta))
-    w = phase*(_np.sin(theta/2.)**d)*(_np.cos(theta/2.)**g)*2**((g+d)/2.)
+    phase = exp(1j*(g+d)/2.*(pi-theta))
+    #w = phase*(_np.sin(theta/2.)**d)*(_np.cos(theta/2.)**g)*2**((g+d)/2.)
+    w = phase*( pw(sin(theta/2.),d) * \
+                pw(cos(theta/2.),g)) *\
+              2**((g+d)/2.)
     bss(theta,scale=scale,shift=shift)
 
     return w

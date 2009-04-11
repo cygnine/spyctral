@@ -4,6 +4,17 @@ import numpy as _np
 
 __all__ = []
 
+# Returns a function that operates the stiffness matrix on a (g,d) =
+# (0,0) modal vector of length N
+def stiff_applicator(N,scale=1.):
+    from quad import N_to_ks
+    from numpy import array
+    ks = N_to_ks(N)
+    ks = array(ks,dtype='complex128')
+    ks *= 1j/scale
+
+    return lambda modes: ks*modes
+
 # Recurrence coefficients for cosine recurrence:
 # cos*Psi_k = sum(c[i]*Psi_i), 
 # i = [-kwedge,-k,-kvee,kvee,k,kwedge]

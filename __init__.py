@@ -9,6 +9,8 @@ import genfourier
 import connection
 import maps
 import fft
+import nodes
+import coeffs
 from eval import *
 from quad import *
 from maps import *
@@ -19,3 +21,5 @@ __all__ += quad.__all__
 __all__ += maps.__all__
 __all__ += genfourier.__all__
 __all__ += fft.__all__
+__all__ += nodes.__all__
+__all__ += coeffs.__all__
