@@ -92,30 +92,73 @@ def sc_expand(cmodes,smodes,N):
 # as an overhead to plug into int_connection_online.
 def int_connection_overhead(N,g,d,G,D):
     from jfft import rmatrix_entries as jconnection_entries
+    from numpy import zeros,ceil
     G = int(G)
     D = int(D)
 
     cconnect = jconnection_entries((N+2)/2,d-1/2.,g-1/2.,D,G)
     sconnect = jconnection_entries(N/2,d+1/2.,g+1/2.,D,G)
+    cmodes = zeros(ceil((N+1.)/2),dtype='complex128')
+    smodes = zeros(N/2,dtype='complex128')
+    NEven = not(N%2)
+    # location of mode 0
+    Nmiddle = N/2
 
-    return [cconnect,sconnect]
+    return [cconnect,sconnect,cmodes,smodes,NEven,Nmiddle]
+    #return [cconnect,sconnect]
 
 # Applies the connection matrices returned by int_connection_overhead to
 # perform the fft.
 def int_connection_online(modes,matrices):
-    from jfft import rmatrix_entries_apply as jconnection_apply
+    #from jfft import rmatrix_entries_apply as jconnection_apply
+    from numpy import sqrt,zeros,hstack,flipud
+    # ONLY USE THE FOLLOWING LINE FOR C/FORTRAN TIMINGS
+    #from jfft_helpers import rmatrixapply as jconnection_apply
+    #from jfft_helpers import rmatrixapplyfast as jconnection_apply
+    from FourierHelpers import rmatrixapplyfourier as jconnection_apply
 
     if matrices[0].shape[1]>1:
         N = modes.shape[0]
+        # How to read the code below:
+        # cmodes = matrices[2]
+        # smodes = matrices[3]
+        # NEven = matrices[4]
+        Nmiddle = matrices[5]
 
-        [cmodes,smodes] = sc_collapse(modes,N)
+        ### sc_collapse ###
+        # Ensures modes is odd-length
+        if matrices[4]:
+            modes = hstack((modes,0.))
 
-        cmodes = jconnection_apply(cmodes,matrices[0])
-        smodes = jconnection_apply(smodes,matrices[1])
+        matrices[3] = flipud(modes[:Nmiddle])
+        matrices[2][1:] = 1/2.*(modes[(Nmiddle+1):] + matrices[3])
+        matrices[2][0] = sqrt(2)/2*modes[Nmiddle]
+        matrices[3] = 1/2.*(modes[(Nmiddle+1):] - matrices[3])
 
-        return sc_expand(cmodes,smodes,N)
+        ### connection ###
+        #matrices[2] = jconnection_apply(matrices[2],matrices[0])
+        #matrices[3] = jconnection_apply(matrices[3],matrices[1])
+        [matrices[2],matrices[3]] = jconnection_apply(matrices[2],matrices[0],\
+                                    matrices[3],matrices[1])
+
+        #### sc_expand ###
+        modes[Nmiddle] = matrices[2][0]*sqrt(2)
+        modes[(Nmiddle+1):] = matrices[2][1:]+matrices[3]
+        modes[Nmiddle-1::-1] = (matrices[2][1:]-matrices[3])
+        if matrices[4]:
+            return modes[:-1]
+        else:
+            return modes
+
+        # Using utility functions:
+        #[cmodes,smodes] = sc_collapse(modes,N)
+        #cmodes = jconnection_apply(cmodes,matrices[0])
+        #smodes = jconnection_apply(smodes,matrices[1])
+        #return sc_expand(cmodes,smodes,N)
+
     else: 
         return modes.copy()
+        #return modes
 
 def int_connection_backward_online(modes,matrices):
     from jfft import rmatrix_entries_invert as jconnection_apply
