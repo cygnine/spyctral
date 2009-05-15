@@ -41,7 +41,8 @@ def genwiener_gquad(N,s=1.,t=0,shift=0.,scale=1.):
 
 # Returns the `Gauss' quadrature rule for the weighted functions:
 def genwienerw_pgquad(N,s=1.,t=0,shift=0.,scale=1.):
-    from fourier.quad import genfourierw_pgquad as gq
+    #from fourier.quad import genfourierw_pgquad as gq
+    from fourier.quad import genfourier_gquad as gq
     from wienerfun.eval import wx
 
     [theta,w] = gq(N,s-1.,t)

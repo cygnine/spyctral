@@ -9,6 +9,7 @@ import eval
 import coeffs
 import modes
 import nodes
+import fft
 
 from coeffs import *
 
@@ -18,3 +19,4 @@ __all__ += eval.__all__
 __all__ += coeffs.__all__
 __all__ += modes.__all__
 __all__ += nodes.__all__
+__all__ += fft.__all__
