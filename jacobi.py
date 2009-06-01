@@ -345,3 +345,14 @@ def gamman(n,alpha=1/2.,beta=1/2.):
 
     return gammas.squeeze()
 
+
+########################################################
+#                 NODAL FUNCTIONS                      #
+########################################################
+def scale_nodes(L,N,delta=0.5,alpha=-0.5,beta=-0.5):
+
+    from spectral_common import scale_factor
+
+    x = gquad(N,alpha=alpha,beta=beta)[0]
+
+    return scale_factor(L,x,scale=delta)
