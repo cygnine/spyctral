@@ -10,6 +10,10 @@ import scipy.special as _nf
 #from opoly1 import eval_opoly, eval_opolyn, opoly_gq, opoly_grq, opoly_glq
 import opoly1
 import cheb1
+import spectral_common
+
+Decimate = spectral_common.DecimateK
+LowPass = spectral_common.LowPassK
 
 # Returns the first N Jacobi recurrence coefficients
 def recurrence(N,alpha=-1/2.,beta=-1/2.,shift=0,scale=1) :
