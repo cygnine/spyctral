@@ -357,6 +357,6 @@ def scale_nodes(L,N,delta=0.5,alpha=-0.5,beta=-0.5):
 
     from spectral_common import scale_factor
 
-    x = gquad(N,alpha=alpha,beta=beta)[0]
+    x = gquad(N,a=alpha,b=beta)[0]
 
     return scale_factor(L,x,scale=delta)
