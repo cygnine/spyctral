@@ -12,8 +12,8 @@ import opoly1
 import cheb1
 import spectral_common
 
-Decimate = spectral_common.DecimateK
-LowPass = spectral_common.LowPassK
+Decimate = spectral_common.DecimateN
+LowPass = spectral_common.LowPassN
 
 # Returns the first N Jacobi recurrence coefficients
 def recurrence(N,alpha=-1/2.,beta=-1/2.,shift=0,scale=1) :
