@@ -121,7 +121,9 @@ def genfourierw(theta,k,g=0.,d=0.,shift=0.,scale=1.):
     #w *= (1+_np.cos(theta))**(g/2.)
 
     #phi = _np.dot(_np.diag(w),psi)
-    phi = _np.dot(_np.diag(wtheta_sqrt(theta,g=g,d=d,shift=0.,scale=1.)),psi).squeeze()
+    #phi = _np.dot(_np.diag(wtheta_sqrt(theta,g=g,d=d,shift=0.,scale=1.)),psi).squeeze()
+    # Same as previous line, but much smarter (or rather, not stupid)
+    phi = (wtheta_sqrt(theta,g=g,d=d,shift=0.,scale=1.)*psi.T).T
 
     bss(theta,shift=shift,scale=scale)
     # Scaling:
