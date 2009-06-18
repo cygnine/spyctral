@@ -10,10 +10,10 @@ import scipy.special as _nf
 #from opoly1 import eval_opoly, eval_opolyn, opoly_gq, opoly_grq, opoly_glq
 import spyctral.opoly1d as opoly1
 import cheb1
-from spyctral import spectral_common
+from spyctral import common
 
-Decimate = spectral_common.DecimateN
-LowPass = spectral_common.LowPassN
+Decimate = common.DecimateN
+LowPass = common.LowPassN
 
 # Returns the first N Jacobi recurrence coefficients
 def recurrence(N,alpha=-1/2.,beta=-1/2.,shift=0,scale=1) :
@@ -84,8 +84,8 @@ def recurrence_ns(ns,alpha=-1/2.,beta=-1/2.,shift=0,scale=1) :
 # at the points x (list)
 def jpoly(x,n,alpha=-1/2.,beta=-1/2.,d=0, scale=1., shift=0.) :
     from numpy import arange
-    from spyctral.spectral_common import forward_scaleshift as fss
-    from spyctral.spectral_common import backward_scaleshift as bss
+    from spyctral.common import forward_scaleshift as fss
+    from spyctral.common import backward_scaleshift as bss
     N = _np.max(n);
     [a,b] = recurrence(N+1,alpha,beta)
 
@@ -104,8 +104,8 @@ def jpoly(x,n,alpha=-1/2.,beta=-1/2.,d=0, scale=1., shift=0.) :
 def jpolyn(x,n,alpha=-1/2.,beta=-1/2.,d=0,scale=1.,shift=0.) :
 
     from numpy import arange,sqrt
-    from spyctral.spectral_common import forward_scaleshift as fss
-    from spyctral.spectral_common import backward_scaleshift as bss
+    from spyctral.common import forward_scaleshift as fss
+    from spyctral.common import backward_scaleshift as bss
 
     n = _np.array(n)
     N = _np.max(n);
@@ -134,7 +134,7 @@ def djpolyn(x,n,alpha=-1/2.,beta=-1/2.,scale=1.,shift=0.):
 # (-scale,scale)+shift
 # The quadrature rule is normalized to reflect the real Jacobian
 def gquad(N,a=-1/2.,b=-1/2.,shift=0.,scale=1.) : 
-    from spyctral.spectral_common import backward_scaleshift as bss
+    from spyctral.common import backward_scaleshift as bss
 
     tol = 1e-12;
     if (abs(a+1/2.)<tol) & (abs(b+1/2.)<tol) :
@@ -149,8 +149,8 @@ def gquad(N,a=-1/2.,b=-1/2.,shift=0.,scale=1.) :
 # Returns the N-point Jacobi-Gauss-Radau(a,b) quadrature rule over the interval
 # (-scale,scale)+shift
 def grquad(N,a=-1/2.,b=-1/2.,r0=-1.,shift=0,scale=1) : 
-    from spyctral.spectral_common import forward_scaleshift as fss
-    from spyctral.spectral_common import backward_scaleshift as bss
+    from spyctral.common import forward_scaleshift as fss
+    from spyctral.common import backward_scaleshift as bss
 
     tol = 1e-12;
     if (abs(a+1/2.)<tol) & (abs(b+1/2.)<tol) & (abs(abs(r0)-1.)<tol) :
@@ -167,8 +167,8 @@ def grquad(N,a=-1/2.,b=-1/2.,r0=-1.,shift=0,scale=1) :
 # Returns the N-point Jacobi-Gauss-Lobatto(a,b) quadrature rule over the interval
 # (-scale,scale)+shift
 def glquad(N,a=-1/2.,b=-1/2.,r0=False,shift=0.,scale=1.) : 
-    from spyctral.spectral_common import forward_scaleshift as fss
-    from spyctral.spectral_common import backward_scaleshift as bss
+    from spyctral.common import forward_scaleshift as fss
+    from spyctral.common import backward_scaleshift as bss
 
     from numpy import array
 
@@ -355,7 +355,7 @@ def gamman(n,alpha=1/2.,beta=1/2.):
 ########################################################
 def scale_nodes(L,N,delta=0.5,alpha=-0.5,beta=-0.5):
 
-    from spyctral.spectral_common import scale_factor
+    from spyctral.common import scale_factor
 
     x = gquad(N,a=alpha,b=beta)[0]
 
