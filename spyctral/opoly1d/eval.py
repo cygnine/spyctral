@@ -2,135 +2,109 @@
 # 
 # Routines for evaluation of polynomials
 
-__all__ = ['eval_opoly', 'eval_opolyn']
+__all__ = ['eval_opoly', 'eval_normalized_opoly']
 
 import numpy as _np
-
-# Almost all information about a family of orthogonal polynomials can
-# be derived from the recurrence relation. Therefore, when doing
-# affine rescalings of the real line, we'll just modify the recurrence
-# coefficients: it makes life easier to hide this flexibility in the
-# abstraction of the recurrence.
-# Shift = linear shift (relative to 0)
-# Scale = represenative length scale (relative to 1)
-# x ------> w = x/scale + shift
-def recurrence_scaleshift(ab,shift=0.,scale=1.):
-    # a = shift + a*scale
-    ab[0] *= scale
-    ab[0] += shift
-    # b = b*(scale**2) (except b[0] = b[0]*scale, which is the Jacobian)
-    ab[1][1:] *= scale**2
-    ab[1][0] /= scale
-    return ab
 
 # Evaluates the monic orthogonal polynomials at x defined by the recurrence constants
 # a and b. It is assumed that a and b are long enough to evaluate the max(n)-th
 # orthogonal polynomial. The d'th derivatives are evaluated. 
 # The output is a length(d)-list containing length(x) by length(n) arrays
 def eval_opoly(x,n,a,b,d=[0]):
+    from numpy import array, max, zeros
+    from scipy import factorial
+    from pyspec.common.typechecks import TestListType
+
+    map(TestListType,[x,n,a,b], ['x','n','a','b'])
 
     # Preprocessing: unravel x and n arrays
-    x = _np.array(x)
-    n = _np.array(n)
-    N = _np.max(n)
-    D = _np.max(d)
-    x = x.ravel()
-    n = n.ravel()
-
-    # This step should be done before calling this function
-    #[a,b] = recurrence_scaleshift([a,b],scale=scale,shift=shift)
+    x = array(x).ravel()
+    n = array(n).ravel()
+    N = max(n)
+    D = max(d)
 
     # Cast int d as list
     if type(d) != list :
         d = [d]
    
     # Allocation
-    p = _np.zeros([x.size, N+2, D+1]);
+    p0 = zeros([x.size, N+1])
+    p1 = zeros([x.size, N+1])
+    p = zeros([x.size, len(n), len(d)]);
 
-    p[:,0,0] = 1.;
-    
     if N==0 :
-        return p[:,n,d]
-
-    # Initial conditions for the recurrence relation, N=1
-    p[:,1,0] = p[:,0,0]*(x-a[0])
-    if D > 0 :
-        p[:,1,1] = p[:,0,0]
+        p[:,n==0,d==0] = 1.
+        return p.squeeze()
 
     # Recurrence
-    for q in range(N) :
-        for qq in range(D+1) :
-            p[:,q+2,qq] = (x-a[q+1])*p[:,q+1,qq] - b[q+1]*p[:,q,qq]
-            if qq>0 :  # Correction for evaluation of derivatives
-                p[:,q+2,qq] += qq*p[:,q+1,qq-1]
+    Dcount = 0
+    for qq in range(D+1):
+        # start recurrence
+        p1[:,:qq] = 0.
+        p1[:,qq] = factorial(qq)
+        p1[:,qq+1] = (x-a[qq])*p1[:,qq] + qq*p0[:,qq]
+    
+        for q in range(2+qq,N+1):
+            p1[:,q] = (x-a[q-1])*p1[:,q-1] - b[q-1]*p1[:,q-2] + qq*p0[:,q-1]
+        # Assignment
+        if qq in d:
+            p[:,:,Dcount] = p1[:,n]
+            Dcount += 1
+        p0 = p1.copy()
 
-    if _np.size(d) > 1 :
-        pr = []
-        for q in d :
-            pr.append(p[:,n,q])
-    else :
-        pr = p[:,n,d[0]]
-
-    return pr
+    return p.squeeze()
 
 # Evaluates the orthonormal polynomials at x defined by the recurrence constants
 # a and b. It is assumed that a and b are long enough to evaluate the max(n)-th
 # orthogonal polynomial. The d'th derivatives are evaluated. 
 # The output is a length(x) by length(n) by length(d) array
-def eval_opolyn(x,n,a,b,d=[0]):
+def eval_normalized_opoly(x,n,a,b,d=[0]):
+
+    from numpy import array, max, zeros, sqrt, prod
+    from scipy import factorial
+    from pyspec.common.typechecks import TestListType
+
+    map(TestListType,[x,n,a,b], ['x','n','a','b'])
 
     # Preprocessing: unravel x and n arrays
-    x = _np.array(x)
-    n = _np.array(n,dtype='int')
-    N = _np.round(_np.max(n))
-    D = int(_np.max(d))
-    x = x.ravel()
-    n = n.ravel()
-
-    # This step should be done before calling this function
-    #[a,b] = recurrence_scaleshift([a,b],scale=scale,shift=shift)
-
-    if N<0:
-        N = 0
-
-    nzeros = n<0
-    n[nzeros] = 0
+    x = array(x).ravel()
+    n = array(n).ravel()
+    N = max(n)
+    D = max(d)
 
     # Cast int d as list
     if type(d) != list :
         d = [d]
-
+   
     # Allocation
-    p = _np.zeros([x.size, N+2, D+1])
+    p0 = zeros([x.size, N+1])
+    p1 = zeros([x.size, N+1])
+    p = zeros([x.size, len(n), len(d)]);
 
-    p[:,0,0] = 1./(b[0]**(1/2.))
-    
+    # Preprocessing on recurrence coefficients
+    bsq = sqrt(b)
+
     if N==0 :
-        p[:,n<0] = 0.
-        return p[:,n,d].squeeze()
+        p[:,n==0,d==0] = 1./bsq[0]
+        return p.squeeze()
 
-    # Initial conditions for the recurrence relation, N=1
-    p[:,1,0] = 1./(b[1]**(1/2.))*p[:,0,0]*(x-a[0])
-    if D > 0 :
-        p[:,1,1] = p[:,0,0]/(b[1]**(1/2.))
+    # Recurrence
+    Dcount = 0
+    for qq in range(D+1):
+        # start recurrence
+        p1[:,:qq] = 0.
+        p1[:,qq] = factorial(qq)/prod(bsq[:(qq+1)])
+        p1[:,qq+1] = 1/bsq[qq+1]*((x-a[qq])*p1[:,qq] + qq*p0[:,qq])
+    
+        for q in range(2+qq,N+1):
+            p1[:,q] = 1/bsq[q]*((x-a[q-1])*p1[:,q-1] - \
+                                bsq[q-1]*p1[:,q-2] + \
+                                qq*p0[:,q-1])
 
-    for q in range(N) :
-        for qq in range(D+1) :
-            p[:,q+2,qq] = (x-a[q+1])*p[:,q+1,qq] - (b[q+1]**(1/2.))*p[:,q,qq]
-            if qq>0 :  # Correction for evaluation of derivatives
-                p[:,q+2,qq] += qq*p[:,q+1,qq-1]
+        # Assignment
+        if qq in d:
+            p[:,:,Dcount] = p1[:,n]
+            Dcount += 1
+        p0 = p1.copy()
 
-            p[:,q+2,qq] /= (b[q+2]**(1/2.))
-
-
-    if _np.size(d) > 1 :
-        pr = []
-        for q in d :
-            temp = p[:,_np.abs(n),q]
-            temp[:,n<0] = 0.
-            pr.append(temp)
-    else :
-        pr = p[:,_np.abs(n),d[0]]
-        pr[:,n<0] = 0.
-
-    return pr.squeeze()
+    return p.squeeze()
