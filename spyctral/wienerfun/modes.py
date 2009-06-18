@@ -3,12 +3,12 @@
 # Module for doing modal-nodal transformations for cardinal Whittaker
 # splines
 
-import spectral_common
+import spyctral.common
 
 __all__ = []
 
-Decimate = spectral_common.DecimateK
-LowPass = spectral_common.LowPassK
+Decimate = spyctral.common.DecimateK
+LowPass = spyctral.common.LowPassK
 
 # Given a function f, output N modes. If N is even, bias is to the
 # left (negative).

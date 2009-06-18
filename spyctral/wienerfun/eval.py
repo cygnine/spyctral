@@ -12,7 +12,7 @@ __all__ = ['genwiener',
 def genwiener(x,k,s=1.,t=0.,shift=0.,scale=1.):
 
     from numpy import sqrt
-    from fourier.genfourier import genfourier
+    from spyctral.fourier.genfourier import genfourier
 
     # Preprocessing and setup
     x = _np.array(x)
@@ -28,7 +28,7 @@ def genwiener(x,k,s=1.,t=0.,shift=0.,scale=1.):
 # functions
 def dgenwiener(x,k,s=1.,t=0.):
 
-    from fourier.genfourier import dgenfourier
+    from spyctral.fourier.genfourier import dgenfourier
 
     # Preprocessing and setup
     x = _np.array(x)
@@ -45,7 +45,7 @@ def dgenwiener(x,k,s=1.,t=0.):
 def genwienerw(x,k,s=1.,t=0.,shift=0.,scale=1.):
 
     from numpy import sqrt
-    from fourier.genfourier import genfourier
+    from spyctral.fourier.genfourier import genfourier
 
     # Preprocessing and setup
     x = _np.array(x)
@@ -65,7 +65,7 @@ def genwienerw(x,k,s=1.,t=0.,shift=0.,scale=1.):
 def xiw(x,n,s=1.,t=0.,shift=0.,scale=1.):
 
     from numpy import sqrt
-    from fourier.genfourier import genfourier
+    from spyctral.fourier.genfourier import genfourier
 
     # Preprocessing and setup
     x = _np.array(x)
@@ -88,7 +88,7 @@ def xiw(x,n,s=1.,t=0.,shift=0.,scale=1.):
 def dgenwienerw(x,k,s=1.,t=0.,shift=0.,scale=1.):
 
     from numpy import sqrt
-    from fourier.genfourier import genfourier, dgenfourier
+    from spyctral.fourier.genfourier import genfourier, dgenfourier
     from maps import dthetadx
 
     # Preprocessing and setup
@@ -112,7 +112,7 @@ def dgenwienerw(x,k,s=1.,t=0.,shift=0.,scale=1.):
 def dxiw(x,n,s=1.,t=0.,shift=0.,scale=1.):
 
     from numpy import sqrt
-    from fourier.genfourier import genfourier, dgenfourier
+    from spyctral.fourier.genfourier import genfourier, dgenfourier
     from maps import dthetadx
 
     # Preprocessing and setup
@@ -138,7 +138,7 @@ def dxiw(x,n,s=1.,t=0.,shift=0.,scale=1.):
 # Evaluates the weight function
 def wx(x,s=1.,t=0.,shift=0.,scale=1.):
 
-    from fourier.genfourier import wtheta
+    from spyctral.fourier.genfourier import wtheta
 
     theta = maps.x2theta(x,shift=shift,scale=scale)
 

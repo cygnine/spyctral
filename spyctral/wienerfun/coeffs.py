@@ -46,7 +46,7 @@ def genwienerw_lemma1_entries(ks,s=1.,t=0.):
 # Each row contains six columns: kvee, -kvee, k, -k, kwedge, -kwedge
 def genwiener_stiff_entries(ks,s=1.,t=0.):
 
-    import opoly1.jacobi as jac
+    import spyctral.opoly1d.jacobi as jac
     from numpy import sign as sgn
 
     ks = _np.array(ks,dtype='int')

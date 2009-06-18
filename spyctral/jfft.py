@@ -2,7 +2,7 @@
 # Module to load constants necessary for using the FFT to perform Jacobi
 # polynomial transformations. 
 
-import opoly1.jacobi as jacobi
+import spyctral.opoly1d.jacobi as jacobi
 from scipy import sparse
 import numpy as _np
 

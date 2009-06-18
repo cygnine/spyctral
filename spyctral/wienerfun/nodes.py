@@ -7,7 +7,7 @@ __all__ = []
 def scale_nodes(L,N,delta=0.5,s=1.,t=0.):
 
     from quad import genwiener_gquad as gq
-    from spectral_common import scale_factor
+    from spyctral.common import scale_factor
 
     [x,w] = gq(N,s=s,t=t)
 

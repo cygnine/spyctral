@@ -9,7 +9,7 @@ import scipy as _sp
 # Wiener rational functions 
 def fft_nodes_to_modes(f,s=1.,t=0.,shift=0.,scale=1.):
 
-    from fourier.fft import fft as fft_Psi
+    from spyctral.fourier.fft import fft as fft_Psi
     from wienerfun.eval import wx_sqrt
     from wienerfun.quad import genwiener_gquad as gq
 
@@ -28,7 +28,7 @@ def fft_nodes_to_modes(f,s=1.,t=0.,shift=0.,scale=1.):
 def fft_nodes_to_modes_overhead(N,s=1.,t=0.,shift=0.,scale=1.):
 
     from numpy import sqrt
-    from fourier.fft import fft_overhead
+    from spyctral.fourier.fft import fft_overhead
     from wienerfun.eval import wx_sqrt
     from wienerfun.quad import genwiener_gquad as gq
 
@@ -41,7 +41,7 @@ def fft_nodes_to_modes_overhead(N,s=1.,t=0.,shift=0.,scale=1.):
 # Function that does all the online fft computations
 def fft_nodes_to_modes_online(f,overhead):
 
-    from fourier.fft import fft_online
+    from spyctral.fourier.fft import fft_online
 
     temp = fft_online(f*overhead[0],overhead[1])
 
@@ -55,8 +55,8 @@ def fft_nodes_to_modes_online(f,overhead):
 # DOES NOT DO t>0 !!!!!
 def fft_nodes_to_modes_galerkin(f,s=1.,t=0.,shift=0.,scale=1.):
 
-    from fourier.fft import fft as fft_Psi
-    from fourier.connection import int_connection as connect
+    from spyctral.fourier.fft import fft as fft_Psi
+    from spyctral.fourier.connection import int_connection as connect
     from numpy import sqrt,ones,abs,array
     from misc import pascal_row
     N = len(f)
@@ -86,8 +86,8 @@ def fft_nodes_to_modes_galerkin(f,s=1.,t=0.,shift=0.,scale=1.):
 # Function that computes overhead stuff for FFT
 def fft_galerkin_overhead(N,s=1.,t=0.,shift=0.,scale=1.):
     from numpy import sqrt
-    from fourier.fft import fft_overhead
-    from fourier.connection import int_connection_overhead
+    from spyctral.fourier.fft import fft_overhead
+    from spyctral.fourier.connection import int_connection_overhead
 
     foverhead = fft_overhead(N)
     premult = 2**(s/2.)/(1j)**s*sqrt(scale)
@@ -96,9 +96,10 @@ def fft_galerkin_overhead(N,s=1.,t=0.,shift=0.,scale=1.):
     return [premult,foverhead,coverhead,int(s)]
 
 # Function that does all the online fft computations
+"""
 def fft_galerkin_online(f,overhead):
-    from fourier.fft import fft_online
-    from fourier.connection import int_connection_online as connect
+    from spyctral.fourier.fft import fft_online
+    from spyctral.fourier.connection import int_connection_online as connect
     from bidiag_invert import ones_bidiag_repeat
 
     N = f.size
@@ -118,6 +119,7 @@ def fft_galerkin_online(f,overhead):
         modes[-overhead[3]:] = 0
 
     return modes
+"""
 
 
 
@@ -125,11 +127,11 @@ def fft_galerkin_online(f,overhead):
 # the generalized Wiener rational functions
 def fft_modes_to_nodes(F,s=1.,t=0.,shift=0.,scale=1.):
 
-    from fourier.fft import ifft as ifft_Psi
+    from spyctral.fourier.fft import ifft as ifft_Psi
     from wienerfun.eval import wx_sqrt
     from wienerfun.quad import genwiener_gquad as gq
 
-    from fourier.fft import fft_overhead, ifft_online
+    from spyctral.fourier.fft import fft_overhead, ifft_online
 
     N = F.size
 
@@ -149,7 +151,7 @@ def fft_modes_to_nodes(F,s=1.,t=0.,shift=0.,scale=1.):
 # it, we'll just divide by it.
 def fft_modes_to_nodes_online(f,overhead):
 
-    from fourier.fft import ifft_online
+    from spyctral.fourier.fft import ifft_online
 
     # overhead[1] = overhead from fourier.fft
     fx = ifft_online(f,overhead[1])
