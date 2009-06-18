@@ -27,7 +27,7 @@ def fseval(x,ns,scale=1.,shift=0.) :
 """
 
 
-def fseries_eval(theta,k,g=0.,d=0.,shift=0.,scale=1.):
+def fseries_eval(theta,k,gamma=0.,delta=0.,shift=0.,scale=1.):
     """
     Evaluates the generalized Szego-Fourier functions at the locations theta \in 
     [-pi,pi]. This function mods the inputs theta to lie in this interval and then
@@ -57,14 +57,14 @@ def fseries_eval(theta,k,g=0.,d=0.,shift=0.,scale=1.):
     r = cos(theta)
 
     # Evaluate polynomials and multiplication factors
-    p1 = jpoly(r,abs(k),d-1/2.,g-1/2.).reshape([theta.size,k.size])
+    p1 = jpoly(r,abs(k),delta-1/2.,gamma-1/2.).reshape([theta.size,k.size])
 
     # Add things together
     Psi = zeros([theta.size,k.size],dtype=complex)
     Psi[:,~kneq0] = 1/sqrt(2)*p1[:,~kneq0]
 
     if k[kneq0].any():
-        p2 = jpoly(r,_np.abs(k[kneq0])-1,d+1/2.,g+1/2.).\
+        p2 = jpoly(r,_np.abs(k[kneq0])-1,delta+1/2.,gamma+1/2.).\
                 reshape([theta.size,k[kneq0].size])
         kmat = sign(k[kneq0])
         tmat = sin(theta)
@@ -75,11 +75,11 @@ def fseries_eval(theta,k,g=0.,d=0.,shift=0.,scale=1.):
     return Psi.squeeze()
 
 
-def dfseries_eval(theta,k,g=0.,d=0.,shift=0.,scale=1.):
+def dfseries_eval(theta,k,gamma=0.,delta=0.,shift=0.,scale=1.):
     """
     Evaluates the derivative of the generalized Szego-Fourier functions at the locations theta \in 
     [-pi,pi]. This function mods the inputs theta to lie in this interval and then
-    evaluates them. The function class is (g,d), and the function index is the
+    evaluates them. The function class is (gamma,delta), and the function index is the
     vector of integers k
     """
 
@@ -100,10 +100,10 @@ def dfseries_eval(theta,k,g=0.,d=0.,shift=0.,scale=1.):
     k = array(k)
     k = k.ravel()
     kneq0 = k != 0
-    a = d-1/2.
-    b = g-1/2.
+    a = delta-1/2.
+    b = gamma-1/2.
 
-    r = _np.cos(theta)
+    r = cos(theta)
 
     # Term-by-term: first the even term
     dPsi = zeros([theta.size,k.size],dtype='complex128')
@@ -134,7 +134,7 @@ def dfseries_eval(theta,k,g=0.,d=0.,shift=0.,scale=1.):
 # [-pi,pi]. This function mods the inputs theta to lie in this interval and then
 # evaluates them. The function class is (g,d), and the function index is the
 # vector of integers k
-def weighted_fseries(theta,k,g=0.,d=0.,shift=0.,scale=1.):
+def weighted_fseries(theta,k,gamma=0.,delta=0.,shift=0.,scale=1.):
 
     from pyspec.common.maps import standard_scaleshift as sss
     from pyspec.common.maps import physical_scaleshift as pss
@@ -145,8 +145,8 @@ def weighted_fseries(theta,k,g=0.,d=0.,shift=0.,scale=1.):
     theta = theta.ravel()
     sss(theta,shift=shift,scale=scale)
 
-    psi = fseries(theta,k,g,d,shift=0.,scale=1.)
-    phi = (wsqrt_bias(theta,g=g,d=d,shift=0.,scale=1.)*psi.T).T
+    psi = fseries(theta,k,gamma=gamma,delta=delta,shift=0.,scale=1.)
+    phi = (wsqrt_bias(theta,gamma=gamma,delta=delta,shift=0.,scale=1.)*psi.T).T
 
     pss(theta,shift=shift,scale=scale)
     # Scaling:
@@ -154,14 +154,14 @@ def weighted_fseries(theta,k,g=0.,d=0.,shift=0.,scale=1.):
 
 # Evaluates the derivative of the shift/scaled weighted generalized
 # Fourier functions. 
-def dweighted_fseries(theta,ks,g=0.,d=0.,shift=0.,scale=1.):
+def dweighted_fseries(theta,ks,gamma=0.,delta=0.,shift=0.,scale=1.):
     from numpy import sqrt
     from weights import wsqrt_bias, dwsqrt_bias
 
-    w = wsqrt_bias(theta,g=g,d=d,scale=scale,shift=shift)
-    dw = dwsqrt_bias(theta,g=g,d=d,scale=scale,shift=shift)
-    Psi = fseries(theta,ks,g=g,d=d,scale=scale,shift=shift)
-    dPsi = dfseries(theta,ks,g=g,d=d,scale=scale,shift=shift)
+    w = wsqrt_bias(theta,gamma=gamma,delta=delta,scale=scale,shift=shift)
+    dw = dwsqrt_bias(theta,gamma=gamma,delta=delta,scale=scale,shift=shift)
+    Psi = fseries(theta,ks,gamma=gamma,delta=delta,scale=scale,shift=shift)
+    dPsi = dfseries(theta,ks,gamma=gamma,delta=delta,scale=scale,shift=shift)
 
     # yay product rule
     return (dw*Psi.T + w*dPsi.T).T/sqrt(scale)

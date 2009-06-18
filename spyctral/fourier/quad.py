@@ -39,7 +39,7 @@ def gquad(N,scale=0.,shift=0.) :
 # The rules are constructed for the unweighted functions, and with the intent
 # that they will eventually be mapped to the real line so that we try not to
 # place nodes at x=\pm\pi
-def gq(N,g=0.,d=0.,shift=0.,scale=1.):
+def gq(N,gamma=0.,delta=0.,shift=0.,scale=1.):
 
     from numpy import arccos, hstack, isnan
     from pyspec.jacobi.quad import gq as jgq
@@ -51,7 +51,7 @@ def gq(N,g=0.,d=0.,shift=0.,scale=1.):
 
     if (N%2)==0:
 
-        [r,wr] = jgq(N/2,d-1/2.,g-1/2.)
+        [r,wr] = jgq(N/2,delta-1/2.,gamma-1/2.)
         r = r.squeeze()
         wr = wr.squeeze()
         temp = arccos(r[::-1])
@@ -63,7 +63,7 @@ def gq(N,g=0.,d=0.,shift=0.,scale=1.):
 
     else:
 
-        [r,wr] = jgrq((N+1)/2,d-1/2.,g-1/2.,r0=1.)
+        [r,wr] = jgrq((N+1)/2,delta-1/2.,gamma-1/2.,r0=1.)
         r = r.squeeze()
         wr = wr.squeeze()
         temp = arccos(r[::-1])
@@ -77,8 +77,8 @@ def gq(N,g=0.,d=0.,shift=0.,scale=1.):
         return [theta,w]
 
 # Returns the Szego-Fourier quadrature for the weighted functions
-def pgq(N,g=0.,d=0.,shift=0.,scale=1.):
+def pgq(N,gamma=0.,delta=0.,shift=0.,scale=1.):
 
     from weights import w as weight
-    [theta,w] = gq(N,g,d,shift=shift,scale=scale)
-    return [theta,w/weight(theta,g,d,shift=shift,scale=scale)*scale]
+    [theta,w] = gq(N,gamma,delta,shift=shift,scale=scale)
+    return [theta,w/weight(theta,gamma,delta,shift=shift,scale=scale)*scale]
