@@ -8,7 +8,7 @@ __all__ = ['recurrence','jpoly','jpolyn','gquad','glquad', 'grquad',
 import numpy as _np
 import scipy.special as _nf
 #from opoly1 import eval_opoly, eval_opolyn, opoly_gq, opoly_grq, opoly_glq
-import spyctral.opoly1d as opoly1
+#import spyctral.opoly1d as opoly1
 import cheb1
 from spyctral import common
 
@@ -86,12 +86,13 @@ def jpoly(x,n,alpha=-1/2.,beta=-1/2.,d=0, scale=1., shift=0.) :
     from numpy import arange
     from spyctral.common import forward_scaleshift as fss
     from spyctral.common import backward_scaleshift as bss
+    from eval import eval_opoly
     N = _np.max(n);
     [a,b] = recurrence(N+1,alpha,beta)
 
     # Shift to standard interval and use opoly 3-term recurrence
     fss(x,scale=scale,shift=shift)
-    temp = opoly1.eval_opoly(x,n,a,b,d)
+    temp = eval_opoly(x,n,a,b,d)
     bss(x,scale=scale,shift=shift)
 
     # Scale appropriately (monic is baaaad if scale is large)
@@ -106,6 +107,7 @@ def jpolyn(x,n,alpha=-1/2.,beta=-1/2.,d=0,scale=1.,shift=0.) :
     from numpy import arange,sqrt
     from spyctral.common import forward_scaleshift as fss
     from spyctral.common import backward_scaleshift as bss
+    from eval  import eval_opolyn
 
     n = _np.array(n)
     N = _np.max(n);
@@ -113,7 +115,7 @@ def jpolyn(x,n,alpha=-1/2.,beta=-1/2.,d=0,scale=1.,shift=0.) :
 
     # Shift to standard interval and use opoly 3-term recurrence
     fss(x,scale=scale,shift=shift)
-    temp = opoly1.eval_opolyn(x,n,a,b,d)
+    temp = eval_opolyn(x,n,a,b,d)
     bss(x,scale=scale,shift=shift)
 
     # Scale appropriately
@@ -135,13 +137,14 @@ def djpolyn(x,n,alpha=-1/2.,beta=-1/2.,scale=1.,shift=0.):
 # The quadrature rule is normalized to reflect the real Jacobian
 def gquad(N,a=-1/2.,b=-1/2.,shift=0.,scale=1.) : 
     from spyctral.common import backward_scaleshift as bss
+    from quad import opoly_gq
 
     tol = 1e-12;
     if (abs(a+1/2.)<tol) & (abs(b+1/2.)<tol) :
         return cheb1.gquad(N,shift=shift,scale=scale)
     else :
         [a_s,b_s] = recurrence(N,a,b)
-        temp = opoly1.opoly_gq(a_s,b_s,N)
+        temp = opoly_gq(a_s,b_s,N)
         temp[1] *= scale
         bss(temp[0],scale=scale,shift=shift)
         return temp
@@ -151,6 +154,7 @@ def gquad(N,a=-1/2.,b=-1/2.,shift=0.,scale=1.) :
 def grquad(N,a=-1/2.,b=-1/2.,r0=-1.,shift=0,scale=1) : 
     from spyctral.common import forward_scaleshift as fss
     from spyctral.common import backward_scaleshift as bss
+    from quad import opoly_gq
 
     tol = 1e-12;
     if (abs(a+1/2.)<tol) & (abs(b+1/2.)<tol) & (abs(abs(r0)-1.)<tol) :
@@ -158,7 +162,7 @@ def grquad(N,a=-1/2.,b=-1/2.,r0=-1.,shift=0,scale=1) :
     else :
         [a_s,b_s] = recurrence(N,a,b,shift,scale)
         fss(r0,scale=scale,shift=shift)
-        temp = opoly1.opoly_gq(a_s,b_s,N,r0=r0)
+        temp = opoly_gq(a_s,b_s,N,r0=r0)
         bss(r0,scale=scale,shift=shift)
         bss(temp[0],scale=scale,shift=shift)
         temp[1] *= scale
@@ -169,6 +173,7 @@ def grquad(N,a=-1/2.,b=-1/2.,r0=-1.,shift=0,scale=1) :
 def glquad(N,a=-1/2.,b=-1/2.,r0=False,shift=0.,scale=1.) : 
     from spyctral.common import forward_scaleshift as fss
     from spyctral.common import backward_scaleshift as bss
+    from quad import opoly_glq
 
     from numpy import array
 
@@ -182,7 +187,7 @@ def glquad(N,a=-1/2.,b=-1/2.,r0=False,shift=0.,scale=1.) :
     else :
         [a_s,b_s] = recurrence(N,a,b)
         fss(r0,scale=scale,shift=shift)
-        temp = opoly1.opoly_glq(a_s,b_s,N,r0=r0)
+        temp = opoly_glq(a_s,b_s,N,r0=r0)
         bss(r0,scale=scale,shift=shift)
         bss(temp[0],scale=scale,shift=shift)
         temp[1] *= scale

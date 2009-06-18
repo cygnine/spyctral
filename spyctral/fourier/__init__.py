@@ -10,7 +10,7 @@ import connection
 import maps
 import fft
 import nodes
-import modes
+#import modes
 import coeffs
 from eval import *
 from quad import *
