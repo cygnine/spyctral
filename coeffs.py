@@ -209,7 +209,7 @@ def genwienerw_stiff(N,s=1.,t=0.,scale=1.):
     V = _np.array(V)
     # Actually, since defintion of stiffness matrix is <phi,dphi>, the I's are
     # column indices, and the J's are row indices
-    return sparse.coo_matrix((V,(J,I)),dims=(N,N)).tocsr()
+    return sparse.coo_matrix((V,(J,I)),shape=(N,N)).tocsr()
     #return [rowks,colks,es]
 
 # Function that calculates overhead for applying the 
