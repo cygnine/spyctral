@@ -21,8 +21,8 @@ def stiff_applicator(N,scale=1.):
 def cos_recurrence(ks,g,d):
 
     from numpy import zeros, abs,sqrt
-    from opoly1.jacobi import recurrence_ns as jrec
-    from opoly1.jacobi import recurrence as jprec
+    from spyctral.opoly1d.jacobi import recurrence_ns as jrec
+    from spyctral.opoly1d.jacobi import recurrence as jprec
 
     coeffs = zeros([ks.size,6])
     al = d-1/2.
@@ -86,7 +86,7 @@ def sin_recurrence(ks,g,d):
 
     from numpy import zeros, abs,sqrt
     from numpy import sign as sgn
-    from opoly1.jacobi import etan, epsilonn 
+    from spyctral.opoly1d.jacobi import etan, epsilonn 
 
     coeffs = zeros([ks.size,6])
     al = d-1/2.

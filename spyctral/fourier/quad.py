@@ -42,9 +42,9 @@ def gquad(N,scale=0.,shift=0.) :
 # place nodes at x=\pm\pi
 def genfourier_gquad(N,g=0.,d=0.,shift=0.,scale=1.):
 
-    from opoly1 import jacobi as jac
-    from spectral_common import forward_scaleshift as fss
-    from spectral_common import backward_scaleshift as bss
+    from spyctral.opoly1d import jacobi as jac
+    from spyctral.common import forward_scaleshift as fss
+    from spyctral.common import backward_scaleshift as bss
 
     N = int(N)
     tol = 1e-8

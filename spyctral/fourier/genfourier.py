@@ -7,15 +7,15 @@ import numpy as _np
 import scipy as _sp
 from scipy import pi
 
-import opoly1.jacobi as jac
+import spyctral.opoly1d.jacobi as jac
 
 # Evaluates the generalized Szego-Fourier functions at the locations theta \in 
 # [-pi,pi]. This function mods the inputs theta to lie in this interval and then
 # evaluates them. The function class is (g,d), and the function index is the
 # vector of integers k
 def genfourier(theta,k,g=0.,d=0.,shift=0.,scale=1.):
-    from spectral_common import forward_scaleshift as fss
-    from spectral_common import backward_scaleshift as bss
+    from spyctral.common import forward_scaleshift as fss
+    from spyctral.common import backward_scaleshift as bss
 
     # Preprocessing: unravelling, etc.
     theta = _np.array(theta)
@@ -62,8 +62,8 @@ def genfourier(theta,k,g=0.,d=0.,shift=0.,scale=1.):
 # evaluates them. The function class is (g,d), and the function index is the
 # vector of integers k
 def dgenfourier(theta,k,g=0.,d=0.,shift=0.,scale=1.):
-    from spectral_common import forward_scaleshift as fss
-    from spectral_common import backward_scaleshift as bss
+    from spyctral.common import forward_scaleshift as fss
+    from spyctral.common import backward_scaleshift as bss
 
     # Preprocessing: unravelling, etc.
     theta = _np.array(theta)
@@ -107,8 +107,8 @@ def dgenfourier(theta,k,g=0.,d=0.,shift=0.,scale=1.):
 # evaluates them. The function class is (g,d), and the function index is the
 # vector of integers k
 def genfourierw(theta,k,g=0.,d=0.,shift=0.,scale=1.):
-    from spectral_common import forward_scaleshift as fss
-    from spectral_common import backward_scaleshift as bss
+    from spyctral.common import forward_scaleshift as fss
+    from spyctral.common import backward_scaleshift as bss
     from numpy import sqrt
 
     theta = _np.array(theta)
@@ -144,8 +144,8 @@ def dgenfourierw(theta,ks,g=0.,d=0.,shift=0.,scale=1.):
 # Defines the regular square root of the Szego-Fourier weight
 def wtheta(theta,g=0.,d=0.,shift=0.,scale=1.):
     from numpy import array
-    from spectral_common import forward_scaleshift as fss
-    from spectral_common import backward_scaleshift as bss
+    from spyctral.common import forward_scaleshift as fss
+    from spyctral.common import backward_scaleshift as bss
 
     theta = array(theta)
     fss(theta,scale=scale,shift=shift)
@@ -155,8 +155,8 @@ def wtheta(theta,g=0.,d=0.,shift=0.,scale=1.):
 
 # Defines the conjugate-biased weight function for the Szego-Fourier basis sets
 def wtheta_sqrt(theta,g=0.,d=0.,shift=0.,scale=1.):
-    from spectral_common import forward_scaleshift as fss
-    from spectral_common import backward_scaleshift as bss
+    from spyctral.common import forward_scaleshift as fss
+    from spyctral.common import backward_scaleshift as bss
     from scipy import power as pw
     from numpy import exp, sin, cos
 
@@ -172,8 +172,8 @@ def wtheta_sqrt(theta,g=0.,d=0.,shift=0.,scale=1.):
 
 # Defines the derivative of the wtheta_sqrt function
 def dwtheta_sqrt(theta,g=0.,d=0.,shift=0.,scale=1.):
-    from spectral_common import forward_scaleshift as fss
-    from spectral_common import backward_scaleshift as bss
+    from spyctral.common import forward_scaleshift as fss
+    from spyctral.common import backward_scaleshift as bss
     from numpy import sin,cos,exp
 
     fss(theta,scale=scale,shift=shift)
