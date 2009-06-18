@@ -27,7 +27,7 @@ def fseval(x,ns,scale=1.,shift=0.) :
 """
 
 
-def fseries_eval(theta,k,gamma=0.,delta=0.,shift=0.,scale=1.):
+def fseries(theta,k,gamma=0.,delta=0.,shift=0.,scale=1.):
     """
     Evaluates the generalized Szego-Fourier functions at the locations theta \in 
     [-pi,pi]. This function mods the inputs theta to lie in this interval and then
@@ -39,9 +39,9 @@ def fseries_eval(theta,k,gamma=0.,delta=0.,shift=0.,scale=1.):
     from numpy import sin, cos, sqrt, sign
     from scipy import pi
 
-    from pyspec.jacobi.eval import jpoly
-    from pyspec.common.maps import standard_scaleshift as sss
-    from pyspec.common.maps import physical_scaleshift as pss
+    from spyctral.jacobi.eval import jpoly
+    from spyctral.common.maps import standard_scaleshift as sss
+    from spyctral.common.maps import physical_scaleshift as pss
 
     # Preprocessing: unravelling, etc.
     theta = array(theta)
@@ -64,7 +64,7 @@ def fseries_eval(theta,k,gamma=0.,delta=0.,shift=0.,scale=1.):
     Psi[:,~kneq0] = 1/sqrt(2)*p1[:,~kneq0]
 
     if k[kneq0].any():
-        p2 = jpoly(r,_np.abs(k[kneq0])-1,delta+1/2.,gamma+1/2.).\
+        p2 = jpoly(r,abs(k[kneq0])-1,delta+1/2.,gamma+1/2.).\
                 reshape([theta.size,k[kneq0].size])
         kmat = sign(k[kneq0])
         tmat = sin(theta)
@@ -75,7 +75,7 @@ def fseries_eval(theta,k,gamma=0.,delta=0.,shift=0.,scale=1.):
     return Psi.squeeze()
 
 
-def dfseries_eval(theta,k,gamma=0.,delta=0.,shift=0.,scale=1.):
+def dfseries(theta,k,gamma=0.,delta=0.,shift=0.,scale=1.):
     """
     Evaluates the derivative of the generalized Szego-Fourier functions at the locations theta \in 
     [-pi,pi]. This function mods the inputs theta to lie in this interval and then
@@ -87,9 +87,9 @@ def dfseries_eval(theta,k,gamma=0.,delta=0.,shift=0.,scale=1.):
     from numpy import sin, cos, sqrt, abs, sign
     from scipy import pi
 
-    from pyspec.jacobi.eval import jpoly, djpoly
-    from pyspec.common.maps import standard_scaleshift as sss
-    from pyspec.common.maps import physical_scaleshift as pss
+    from spyctral.jacobi.eval import jpoly, djpoly
+    from spyctral.common.maps import standard_scaleshift as sss
+    from spyctral.common.maps import physical_scaleshift as pss
 
     # Preprocessing: unravelling, etc.
     theta = array(theta)
@@ -136,8 +136,8 @@ def dfseries_eval(theta,k,gamma=0.,delta=0.,shift=0.,scale=1.):
 # vector of integers k
 def weighted_fseries(theta,k,gamma=0.,delta=0.,shift=0.,scale=1.):
 
-    from pyspec.common.maps import standard_scaleshift as sss
-    from pyspec.common.maps import physical_scaleshift as pss
+    from spyctral.common.maps import standard_scaleshift as sss
+    from spyctral.common.maps import physical_scaleshift as pss
     from numpy import sqrt, array
     from weights import wsqrt_bias
 

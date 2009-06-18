@@ -3,8 +3,10 @@
 #
 # 20080927 -- acn
 
-from eval import *
-from quad import *
+#from eval import *
+#from quad import *
+import eval
+import quad
 
 __all__ = []
 __all__ += eval.__all__

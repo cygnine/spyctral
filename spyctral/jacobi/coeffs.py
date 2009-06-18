@@ -43,28 +43,6 @@ def recurrence(ns,alpha=-1/2.,beta=-1/2.):
 
     return [a_s,b_s]
 
-
-
-########################################################
-#                 NODAL FUNCTIONS                      #
-########################################################
-
-# Returns the scaling factor necessary so that half of the default N
-# Gaussian nodes x satisfy |x|<=L
-def scale_nodes(L,N,alpha=-1/2.,beta=-1/2.):
-
-    from spectral_common import scale_factor
-
-    [x,w] = gquad(N,a=alpha,b=beta)
-
-    return scale_factor(L,x)
-
-
-
-########################################################
-#                 SECONDARY COEFFICIENTS               #
-########################################################
-
 def zetan(n,alpha=-1/2.,beta=-1/2.,normalization='normal'):
 # Computes the derivative coefficient eta for the normalized polynomials:
 # d/dr P_n^(a,b) = zeta*P_{n-1}^(a+1,b+1)
@@ -79,19 +57,20 @@ def zetan(n,alpha=-1/2.,beta=-1/2.,normalization='normal'):
 #                      e_2*P_{n+2}^(a-1,b-1)
 def epsilonn(n,alpha=1/2.,beta=1/2.):
 
-    n = _np.array(n)
+    from numpy import arrray, zeros, sqrt
+    n = array(n)
     N = n.size
     n = n.reshape(N)
 
     a = alpha
     b = beta
 
-    epsn = _np.zeros([N,3])
-    epsn[:,0] = _np.sqrt(4*(n+a)*(n+b)*(n+a+b-1)*(n+a+b)/ \
+    epsn = zeros([N,3])
+    epsn[:,0] = sqrt(4*(n+a)*(n+b)*(n+a+b-1)*(n+a+b)/ \
                         ((2*n+a+b-1)*(2*n+a+b)**2*(2*n+a+b+1)))
-    epsn[:,1] = 2*(alpha-beta)*_np.sqrt((n+1)*(n+a+b))/ \
+    epsn[:,1] = 2*(alpha-beta)*sqrt((n+1)*(n+a+b))/ \
                 ((2*n+a+b)*(2*n+a+b+2))
-    epsn[:,2] = -_np.sqrt(4*(n+1)*(n+2)*(n+a+1)*(n+b+1)/ \
+    epsn[:,2] = -sqrt(4*(n+1)*(n+2)*(n+a+1)*(n+b+1)/ \
                            ((2*n+a+b+1)*(2*n+a+b+2)**2*(2*n+a+b+3)))
     
     return epsn.squeeze()
@@ -100,24 +79,25 @@ def epsilonn(n,alpha=1/2.,beta=1/2.):
 # P_n^(a,b) = h_2*P_n^(a+1,b+1) + h_1*P_{n-1}^(a+1,b+1) + h_0*P_{n-2}^(a+1,b+1)
 def etan(n,alpha=-1/2.,beta=-1/2.):
 
-    n = _np.array(n)
+    from numpy import array, zeros, sqrt
+    n = array(n)
     N = n.size
     n = n.reshape(N)
 
     a = alpha
     b = beta
 
-    etas = _np.zeros([N,3])
+    etas = zeros([N,3])
 
     num = 4*(n+a+1)*(n+b+1)*(n+a+b+1)*(n+a+b+2)
     temp = (2*n+a+b)
     den = (temp+1)*((temp+2)**2)*(temp+3)
-    etas[:,2] = _np.sqrt(num/den)
-    etas[:,1] = 2*(a-b)*_np.sqrt(n*(n+a+b+1))/(temp*(temp+2))
+    etas[:,2] = sqrt(num/den)
+    etas[:,1] = 2*(a-b)*sqrt(n*(n+a+b+1))/(temp*(temp+2))
     
     num = 4*n*(n-1)*(n+a)*(n+b)
     den = (temp-1)*(temp**2)*(temp+1)
-    etas[:,0] = -_np.sqrt(num/den)
+    etas[:,0] = -sqrt(num/den)
 
     return etas.squeeze()
 
@@ -125,19 +105,20 @@ def etan(n,alpha=-1/2.,beta=-1/2.):
 # P_n^(a,b) = -delta^(a,b)_0*P_{n-1}^(a+1,b) + delta^(a,b)_1*P_n^(a+1,b)
 # P_n^(a,b) = delta^(b,a)_0*P_{n-1}^(a,b+1) + delta^(b,a)_1*P_n^(a,b+1)
 def deltan(n,alpha=-1/2.,beta=-1/2.):
+    from numpy import array, zeros, sqrt
 
-    n = _np.array(n)
+    n = array(n)
     N = n.size
     n = n.reshape(N)
 
     a = alpha
     b = beta
 
-    deltas = _np.zeros([N,2])
+    deltas = zeros([N,2])
 
     deltas[:,0] = 2*n*(n+b)/((2*n+a+b)*(2*n+a+b+1))
     deltas[:,1] = 2*(n+a+1)*(n+a+b+1)/((2*n+a+b+1)*(2*n+a+b+2))
-    deltas = _np.sqrt(deltas)
+    deltas = sqrt(deltas)
 
     return deltas.squeeze()
 
@@ -145,59 +126,20 @@ def deltan(n,alpha=-1/2.,beta=-1/2.):
 # (1-r)*P_n^(a,b) = gamma^(a,b)_0*P_{n}^(a-1,b) - gamma^(a,b)_1*P_{n+1}^(a-1,b)
 # (1+r)*P_n^(a,b) = gamma^(b,a)_0*P_{n}^(a,b-1) + gamma^(b,a)_1*P_{n+1}^(a,b-1)
 def gamman(n,alpha=1/2.,beta=1/2.):
+    from numpy import array, zeros, sqrt
 
-    n = _np.array(n)
+    n = array(n)
     N = n.size
     n = n.reshape(N)
 
     a = alpha
     b = beta
 
-    gammas = _np.zeros([N,2])
+    gammas = zeros([N,2])
 
     temp = 2*n+a+b
     gammas[:,0] = 2*(n+a)*(n+a+b)/(temp*(temp+1))
     gammas[:,1] = 2*(n+1)*(n+b+1)/((temp+1)*(temp+2))
-    gammas = _np.sqrt(gammas)
+    gammas = sqrt(gammas)
 
     return gammas.squeeze()
-
-
-########################################################
-#                 MATRIX FUNCTIONS                     #
-########################################################
-
-# Applies the modal stiffness matrix to the coefficients of the L2
-# normalized polynomials. Makes use of the recurrence constant zetan in
-# addition to the sparse representation of the connection coefficients
-# Is an O(N) operation
-def stiff_apply(F,alpha=-1/2.,beta=-1/2.,scale=1.):
-    from jfft import rmatrix_invert
-    from numpy import arange,hstack, array
-
-    N = F.size
-    # Input F is of class (alpha,beta). Take the derivative by promoting
-    # basis functions to (alpha+1,beta+1) using zetan:
-    zetas = zetan(arange(N),alpha=alpha,beta=beta)/scale
-    # Now demote the (alpha+1,beta+1) coefficients back down to
-    # (alpha,beta)
-    filler = array([0.])
-    return hstack((rmatrix_invert(zetas[1:]*F[1:],alpha,beta,1,1),filler))
-
-# Calculates overhead required for applying the modal stiffness matrix
-def stiff_overhead(N,alpha=-1/2.,beta=-1/2.,scale=1.):
-    from jfft import rmatrix_entries
-    from numpy import arange
-
-    zetas = zetan(arange(N),alpha=alpha,beta=beta)/scale
-    Rs = rmatrix_entries(N-1,alpha,beta,1,1)
-    return [zetas[1:],Rs]
-
-# Performs the online application of the stiffness matrix given the
-# overhead from stiff_overhead as input
-def stiff_online(F,overhead):
-    from jfft import rmatrix_entries_invert
-    from numpy import array,hstack
-
-    filler = array([0.])
-    return hstack((rmatrix_entries_invert(overhead[0]*F[1:],overhead[1]),filler))

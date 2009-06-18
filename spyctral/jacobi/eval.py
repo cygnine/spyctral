@@ -53,7 +53,7 @@ def jpoly(x,n,alpha=-1/2.,beta=-1/2.,d=0, normalization='normal',scale=1., shift
     return temp
 
 # Temporary function to evaluate Jacobi derivatives
-def djpolyn(x,n,alpha=-1/2.,beta=-1/2.,normalization='normal',scale=1.,shift=0.):
+def djpoly(x,n,alpha=-1/2.,beta=-1/2.,normalization='normal',scale=1.,shift=0.):
     from coeffs import zetan
     zetas = zetan(n,alpha=alpha,beta=beta,normalization=normalization)/scale
     return jpoly(x,n-1,alpha+1.,beta+1.,normalization=normalization,\
