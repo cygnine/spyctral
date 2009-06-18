@@ -2,7 +2,6 @@
 # Module to load constants necessary for using the FFT to perform Jacobi
 # polynomial transformations. 
 
-import spyctral.jacobi as jacobi
 from scipy import sparse
 
 #__all__ = ['gamma','umat','vmat','rmatrix']
@@ -317,7 +316,7 @@ def chebifft(F,scale=1.):
 # Chebyshev nodes. This method essentially tranlates the Chebyshev interpolant
 # to the Gegenbauer modes. Assumes fx are nodal values at the Chebyshev-Gauss
 # nodes
-def jacfft(fx,A,B,scale=1.) :
+def jacfft(fx,A=0,B=0,scale=1.,shift=0.) :
 
     from numpy.fft import rfft as fft
     from numpy import sqrt,exp
@@ -334,7 +333,7 @@ def jacfft(fx,A,B,scale=1.) :
 # Chebyshev nodes. This method essentially tranlates the Chebyshev interpolant
 # to the Jacobi modes. Assumes fx are nodal values at the Chebyshev-Gauss
 # nodes.
-def jacifft(F,A,B,scale=1.):
+def jacifft(F,A=0,B=0,scale=1.,shift=0.):
 
     from numpy.fft import irfft as ifft
     from numpy import sqrt,exp
@@ -349,7 +348,7 @@ def jacifft(F,A,B,scale=1.):
 
 
 # Computes all necessary overhead for doing a Chebyshev fft
-def chebfft_overhead(N,scale=1.):
+def chebfft_overhead(N,scale=1.,shift=0.):
     from numpy import array, sqrt, exp
     from scipy import pi
 
@@ -379,7 +378,7 @@ def chebifft_online(F,overhead):
     return f[:N].real
 
 # Computes overhead for general Jacobi polynomial transform
-def jacfft_overhead(N,A,B,scale=1.):
+def jacfft_overhead(N,A,B,scale=1.,shift=0.):
 
     cheb_overhead = chebfft_overhead(N,scale=scale)
     connection = rmatrix_entries(N,-1/2.,-1/2.,A,B)
