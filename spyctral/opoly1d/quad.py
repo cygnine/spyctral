@@ -6,7 +6,7 @@ __all__ = ['opoly_gq', 'opoly_grq', 'opoly_glq']
 
 from numpy import array, sqrt, diag, dot
 from numpy.linalg import eigh, inv
-from opoly1 import eval_opoly
+from spyctral.opoly1d import eval_opoly
 import numpy as np
 #from scipy import sparse
 

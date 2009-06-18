@@ -7,13 +7,13 @@ __all__ = []
 
 import numpy as _np
 import scipy.special as _nf
-import opoly1
+from spyctral import opoly1d
 
 # Returns recurrence coefficients for certain values of n
 def recurrence_ns(ns,mu=0,shift=0.,scale=1.):
 
     from numpy import arange
-    from opoly1.eval import recurrence_scaleshift
+    from spyctral.opoly1d.eval import recurrence_scaleshift
 
     ns = _np.array(ns)
     N = ns.size
@@ -40,27 +40,27 @@ def hpoly(x,n,mu=0.,d=0,shift=0.,scale=1.):
 
     N = _np.max(n)
     [a,b] = recurrence(N+1,mu,shift=shift,scale=scale)
-    return opoly1.eval_opoly(x,n,a,b,d)
+    return opoly1d.eval_opoly(x,n,a,b,d)
 
 # Evaluates the L2 normalized Hermite polynomials of order mu at the locations x
 def hpolyn(x,n,mu=0.,d=0,shift=0.,scale=1.):
 
     N = _np.max(n)
     [a,b] = recurrence(N+2,mu,shift=shift,scale=scale)
-    return opoly1.eval_opolyn(x,n,a,b,d)
+    return opoly1d.eval_opolyn(x,n,a,b,d)
 
 # Returns the N-point Hermite-Gauss quadrature rule
 def gquad(N,mu=0.,shift=0.,scale=1.):
 
     [a_s,b_s] = recurrence(N,mu,shift=shift,scale=scale)
-    return opoly1.opoly_gq(a_s,b_s,N)
+    return opoly1d.opoly_gq(a_s,b_s,N)
 
 # Returns the N-point Jacobi-Gauss-Radau(mu) quadrature rule over the interval
 # (-scale,scale)+shift
 def grquad(N,mu=0.,r0=0.,shift=0,scale=1) : 
 
     [a_s,b_s] = recurrence(N,mu,shift=shift,scale=scale)
-    return opoly1.opoly_grq(a_s,b_s,N,r0=r0)
+    return opoly1d.opoly_grq(a_s,b_s,N,r0=r0)
 
 # Returns the weight function for the Hermite polynomials evaluated at a
 # particular location
