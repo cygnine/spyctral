@@ -1,8 +1,5 @@
 # Module for the evaluation of the rational Wiener functions
 
-import numpy as _np
-import scipy as _sp
-
 import maps
 
 __all__ = ['genwiener',
@@ -11,16 +8,17 @@ __all__ = ['genwiener',
 # Evaluates the orthonormalized unweighted Wiener rational functions
 def genwiener(x,k,s=1.,t=0.,shift=0.,scale=1.):
 
-    from numpy import sqrt
-    from spyctral.fourier.genfourier import genfourier
+    from numpy import sqrt, array
+    from spyctral.fourier.eval import fseries as genfourier
+    from maps import x_to_theta as x2theta
 
     # Preprocessing and setup
-    x = _np.array(x)
+    x = array(x)
     x = x.ravel()
-    k = _np.array(k,dtype='int')
+    k = array(k,dtype=int)
     k = k.ravel()
 
-    theta = maps.x2theta(x,shift=shift,scale=scale)
+    theta = x2theta(x,shift=shift,scale=scale)
 
     return genfourier(theta,k,s-1.,t)/sqrt(scale)
 
@@ -28,12 +26,13 @@ def genwiener(x,k,s=1.,t=0.,shift=0.,scale=1.):
 # functions
 def dgenwiener(x,k,s=1.,t=0.):
 
-    from spyctral.fourier.genfourier import dgenfourier
+    from spyctral.fourier.eval import fseries as dgenfourier
+    from numpy import array
 
     # Preprocessing and setup
-    x = _np.array(x)
+    x = array(x)
     x = x.ravel()
-    k = _np.array(k,dtype='int')
+    k = array(k,dtype=int)
     k = k.ravel()   
 
     theta = maps.x2theta(x,shift=shift,scale=scale)
@@ -44,13 +43,13 @@ def dgenwiener(x,k,s=1.,t=0.):
 # Evaluates the orthonormalized weighted Wiener rational functions
 def genwienerw(x,k,s=1.,t=0.,shift=0.,scale=1.):
 
-    from numpy import sqrt
+    from numpy import sqrt, array
     from spyctral.fourier.genfourier import genfourier
 
     # Preprocessing and setup
-    x = _np.array(x)
+    x = array(x)
     x = x.ravel()
-    k = _np.array(k,dtype='int')
+    k = array(k,dtype='int')
     k = k.ravel()
 
     theta = maps.x2theta(x,shift=shift,scale=scale)
@@ -64,13 +63,13 @@ def genwienerw(x,k,s=1.,t=0.,shift=0.,scale=1.):
 # Evaluates the orthonormalized weighted Wiener rational functions
 def xiw(x,n,s=1.,t=0.,shift=0.,scale=1.):
 
-    from numpy import sqrt
+    from numpy import sqrt, array
     from spyctral.fourier.genfourier import genfourier
 
     # Preprocessing and setup
-    x = _np.array(x)
+    x = array(x)
     x = x.ravel()
-    n = _np.array(n,dtype='int')
+    n = array(n,dtype='int')
     n = n.ravel()
 
     theta = maps.x2theta(x,shift=shift,scale=scale)
@@ -87,14 +86,14 @@ def xiw(x,n,s=1.,t=0.,shift=0.,scale=1.):
 # Evaluates the derivative of the orthonormalized weighted Wiener rational functions
 def dgenwienerw(x,k,s=1.,t=0.,shift=0.,scale=1.):
 
-    from numpy import sqrt
+    from numpy import sqrt, array
     from spyctral.fourier.genfourier import genfourier, dgenfourier
     from maps import dthetadx
 
     # Preprocessing and setup
-    x = _np.array(x)
+    x = array(x)
     x = x.ravel()
-    k = _np.array(k,dtype='int')
+    k = array(k,dtype='int')
     k = k.ravel()
 
     theta = maps.x2theta(x,shift=shift,scale=scale)
@@ -111,14 +110,14 @@ def dgenwienerw(x,k,s=1.,t=0.,shift=0.,scale=1.):
 # Evaluates the derivative of the orthonormalized weighted Wiener rational functions
 def dxiw(x,n,s=1.,t=0.,shift=0.,scale=1.):
 
-    from numpy import sqrt
+    from numpy import sqrt, array
     from spyctral.fourier.genfourier import genfourier, dgenfourier
     from maps import dthetadx
 
     # Preprocessing and setup
-    x = _np.array(x)
+    x = array(x)
     x = x.ravel()
-    n = _np.array(n,dtype='int')
+    n = array(n,dtype='int')
     n = n.ravel()
 
     theta = maps.x2theta(x,shift=shift,scale=scale)

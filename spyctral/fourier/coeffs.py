@@ -1,4 +1,5 @@
 # Coefficient module for Fourier package
+# These functions are largely useless right now -- must clean then up
 
 import numpy as _np
 
