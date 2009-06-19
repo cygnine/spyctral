@@ -7,6 +7,7 @@ def stiff_apply(F,alpha=-1/2.,beta=-1/2.,scale=1.):
 
     from jfft import rmatrix_invert
     from numpy import arange,hstack, array
+    from coeffs import zetan
 
     N = F.size
     # Input F is of class (alpha,beta). Take the derivative by promoting
@@ -22,6 +23,7 @@ def stiff_apply(F,alpha=-1/2.,beta=-1/2.,scale=1.):
 def stiff_overhead(N,alpha=-1/2.,beta=-1/2.,scale=1.):
     from jfft import rmatrix_entries
     from numpy import arange
+    from coeffs import zetan
 
     zetas = zetan(arange(N),alpha=alpha,beta=beta)/scale
     Rs = rmatrix_entries(N-1,alpha,beta,1,1)

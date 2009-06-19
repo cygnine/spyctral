@@ -6,4 +6,6 @@
 import eval
 import quad
 import weights
+import mats
+import coeffs
 import jfft
