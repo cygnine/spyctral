@@ -12,7 +12,7 @@
 """
 
 # Defines the Szego-Fourier weight
-def w(theta,gamma=0.,delta=0.,shift=0.,scale=1.):
+def weight(theta,gamma=0.,delta=0.,shift=0.,scale=1.):
     from numpy import array, cos
     from pyspec.common.maps import standard_scaleshift as sss
     from pyspec.common.maps import physical_scaleshift as pss
@@ -24,7 +24,7 @@ def w(theta,gamma=0.,delta=0.,shift=0.,scale=1.):
     return w
 
 # Defines the conjugate-biased square-root weight function for the Szego-Fourier basis sets
-def wsqrt_bias(theta,gamma=0.,delta=0.,shift=0.,scale=1.):
+def sqrt_weight_bias(theta,gamma=0.,delta=0.,shift=0.,scale=1.):
     from numpy import cos, sin, exp
     from pyspec.common.maps import standard_scaleshift as sss
     from pyspec.common.maps import physical_scaleshift as pss
@@ -43,7 +43,7 @@ def wsqrt_bias(theta,gamma=0.,delta=0.,shift=0.,scale=1.):
 # Defines the derivative of the wtheta_sqrt function
 # NOTE: the bias is weird for delta = 0: we take abs(sin(theta/2.)) instead of
 # sin(theta/2.)
-def dwsqrt_bias(theta,gamma=0.,delta=0.,shift=0.,scale=1.):
+def dsqrt_weight_bias(theta,gamma=0.,delta=0.,shift=0.,scale=1.):
     from numpy import cos, sin, exp, abs
     from pyspec.common.maps import standard_scaleshift as sss
     from pyspec.common.maps import physical_scaleshift as pss

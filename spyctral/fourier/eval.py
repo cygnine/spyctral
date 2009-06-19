@@ -6,27 +6,6 @@
 
 from scipy import pi
 
-"""
-# Evaluates the orthonormalized Fourier Series basis functions over the interval
-# [-pi*scale, pi*scale]+shift. 
-def fseval(x,ns,scale=1.,shift=0.) :
-
-    ns = _np.array(ns)
-    # Pre-processing:
-    x = _np.array(x).ravel()
-    X = x.size
-    N = ns.size
-    fs = _np.zeros((X,N),dtype=complex)
-    count = 0
-
-    for n in ns :
-        fs[:,count] = 1./_np.sqrt(2*pi*scale)*_np.exp(1j*n*(x-shift)/scale)
-        count += 1
-
-    return fs
-"""
-
-
 def fseries(theta,k,gamma=0.,delta=0.,shift=0.,scale=1.):
     """
     Evaluates the generalized Szego-Fourier functions at the locations theta \in 
@@ -106,20 +85,16 @@ def dfseries(theta,k,gamma=0.,delta=0.,shift=0.,scale=1.):
     r = cos(theta)
 
     # Term-by-term: first the even term
-    dPsi = zeros([theta.size,k.size],dtype='complex128')
+    dPsi = zeros([theta.size,k.size],dtype=complex)
     dPsi += 1/2.*djpoly(r,abs(k),a,b)
     dPsi = (-sin(theta)*dPsi.T).T
-    #dPsi = _np.dot(_np.diag(-_np.sin(theta)),dPsi)
     dPsi[:,~kneq0] *= sqrt(2)
 
     # Now the odd term:
     if any(kneq0):
         term2 = zeros([theta.size,sum(kneq0)],dtype=complex)
-        #term2 += _np.dot(_np.diag(_np.cos(theta)),jac.jpolyn(r,_np.abs(k[kneq0])-1,a+1,b+1))
         term2 += (cos(theta)*jpoly(r,abs(k[kneq0])-1,a+1,b+1).T).T
-        #term2 += _np.dot(_np.diag(-_np.sin(theta)**2),jac.djpolyn(r,_np.abs(k[kneq0])-1,a+1,b+1))
         term2 += (-sin(theta)**2*djpoly(r,abs(k[kneq0])-1,a+1,b+1).T).T
-        #term2 = 1./2*_np.dot(term2,_np.diag(1j*_np.sign(k[kneq0])))
         term2 = 1./2*term2*(1j*sign(k[kneq0]))
     else:
         term2 = 0.
@@ -139,7 +114,7 @@ def weighted_fseries(theta,k,gamma=0.,delta=0.,shift=0.,scale=1.):
     from spyctral.common.maps import standard_scaleshift as sss
     from spyctral.common.maps import physical_scaleshift as pss
     from numpy import sqrt, array
-    from weights import wsqrt_bias
+    from weights import sqrt_weight_bias as wsqrt_bias
 
     theta = array(theta)
     theta = theta.ravel()
@@ -156,7 +131,8 @@ def weighted_fseries(theta,k,gamma=0.,delta=0.,shift=0.,scale=1.):
 # Fourier functions. 
 def dweighted_fseries(theta,ks,gamma=0.,delta=0.,shift=0.,scale=1.):
     from numpy import sqrt
-    from weights import wsqrt_bias, dwsqrt_bias
+    from weights import sqrt_weight_bias as wsqrt_bias
+    from weights import dsqrt_weight_bias as dwsqrt_bias
 
     w = wsqrt_bias(theta,gamma=gamma,delta=delta,scale=scale,shift=shift)
     dw = dwsqrt_bias(theta,gamma=gamma,delta=delta,scale=scale,shift=shift)

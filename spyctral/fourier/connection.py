@@ -5,77 +5,100 @@
 
 import numpy as _np
 
-# Implements the connection coefficient relation, taking the modes from
-# Szego-Fourier class (g,d) to Szego-Fourier class (g+G,d+D), and casts G and D
-# as integers so that the connection relation is sparse. 
-# The convention assumed for an even number of modes is that they are centered
-# around the zero frequency, and that there is one more negative mode than
-# positive modes.
-# RIGHT NOW ONLY WORKS FOR G,D>0
-def int_connection(modes,g,d,G,D):
 
-    from spyctral.jfft import rmatrix_apply_seq as jconnection
+def int_connection(modes,gamma=0.,delta=0.,G=0,D=0):
+    """
+    Implements the connection coefficient relation, taking the modes from
+    Szego-Fourier class (g,d) to Szego-Fourier class (g+G,d+D), and casts G and D
+    as integers so that the connection relation is sparse. 
+    The convention assumed for an even number of modes is that they are centered
+    around the zero frequency, and that there is one more negative mode than
+    positive modes. Assumes G,D>0. (See int_connection_backward for inverse)
+    """
+
+    from numpy import append
+    from scipy import conj
+    from spyctral.jacobi.jfft import rmatrix_apply_seq as jconnection
     G = int(G)
     D = int(D)
     if (G+D)>0:
 
         N = modes.shape[0]
-
         [cmodes,smodes] = sc_collapse(modes,N)
 
-        cmodes = jconnection(cmodes,d-1/2.,g-1/2.,D,G)
-        smodes = jconnection(smodes,d+1/2.,g+1/2.,D,G)
+        cmodes = jconnection(cmodes,delta-1/2.,gamma-1/2.,D,G)
+        smodes = jconnection(smodes,delta+1/2.,gamma+1/2.,D,G)
 
         return sc_expand(cmodes,smodes,N)
     else:
-        return modes.copy()
+        return modescopy
 
-# Reverses the integer connection performed by int_connection
-# The input modes is a vector of (g+G,d+D) modes, and we wish to demote
-# them back to (g,d) modes.
-def int_connection_backward(modes,g,d,G,D):
 
-    from spyctral.jfft import rmatrix_invert as jconnection_inv
+def int_connection_backward(modes,gamma=0.,delta=0.,G=0,D=0):
+    """
+    Reverses the integer connection performed by int_connection
+    The input modes is a vector of (g+G,d+D) modes, and we wish to demote
+    them back to (g,d) modes.
+    """
+
+    from numpy import append
+    from scipy import conj
+    from spyctral.jacobi.jfft import rmatrix_invert as jconnection_inv
     G = int(G)
     D = int(D)
+
     if (G+D)>0:
 
         N = modes.size
-
         [cmodes,smodes] = sc_collapse(modes,N)
 
-        cmodes = jconnection_inv(cmodes,d-1/2.,g-1/2.,D,G)
-        smodes = jconnection_inv(smodes,d+1/2.,g+1/2.,D,G)
+        cmodes = jconnection_inv(cmodes,delta-1/2.,gamma-1/2.,D,G)
+        smodes = jconnection_inv(smodes,delta+1/2.,gamma+1/2.,D,G)
         
         return sc_expand(cmodes,smodes,N)
     else:
-        return modes.copy()
+        return modescopy
 
 def sc_collapse(modes,N):
-    from numpy import sqrt
+    """
+    Helper function: combines roles of c_collapse, s_collapse
+    """
+    from numpy import sqrt, append
+    from scipy import conj
 
-    tempN = N/2
-    tempN2 = tempN - ((N+1)%2)
+    NEven = (N%2)==0
+    Nq = N + (N+1)%2
+    modescopy = modes.copy()
+    if NEven:
+        modescopy[0] /= 2.
+        modescopy = append(modescopy,conj(modescopy[0]))
 
-    cmodes = modes[:tempN+1][::-1].copy()
+    tempN = Nq/2
+    tempN2 = tempN - ((Nq+1)%2)
+
+    #cmodes = modes[:tempN+1][::-1].copy()
+    cmodes = modescopy[:tempN+1][::-1]
     smodes = -cmodes[1:].copy()
     
-    cmodes[1:tempN2+1] += modes[tempN+1:]
-    smodes[:tempN2] += modes[tempN+1:]
+    cmodes[1:tempN2+1] += modescopy[tempN+1:]
+    smodes[:tempN2] += modescopy[tempN+1:]
     cmodes[0] *= sqrt(2)
 
     return [cmodes*1/2.,smodes*1/2.]
 
-# Helper function: combines roles of c_expand, s_expand
 def sc_expand(cmodes,smodes,N):
+    """
+    Helper function: combines roles of c_expand, s_expand
+    """
     from numpy import sqrt,zeros
+    from scipy import conj
     Neven = (N+1)%2
     n = N/2
     factor = N - Neven
-    cmodes[0] *= sqrt(2)
     
     # 'positive' modes
     pmodes = cmodes.copy()
+    pmodes[0] *= sqrt(2)
     pmodes[1:] += smodes
     # Turn smodes into 'negative' modes
     smodes = (cmodes[1:] - smodes)[::-1]
@@ -84,22 +107,23 @@ def sc_expand(cmodes,smodes,N):
     modes = zeros(2*n+1,dtype='complex128')
     modes[:n],modes[n:] = smodes,pmodes
     if bool(Neven):
+        modes[0] += conj(modes[-1])
         return modes[:-1]
     else:
         return modes
 
 # Returns the necessary matrices for performing the int_connection; use
 # as an overhead to plug into int_connection_online.
-def int_connection_overhead(N,g,d,G,D):
-    from spyctral.jfft import rmatrix_entries as jconnection_entries
+def int_connection_overhead(N,gamma=0.,delta=0.,G=0,D=0):
+    from spyctral.jacobi.jfft import rmatrix_entries as jconnection_entries
     from numpy import zeros,ceil
     G = int(G)
     D = int(D)
 
-    cconnect = jconnection_entries((N+2)/2,d-1/2.,g-1/2.,D,G)
-    sconnect = jconnection_entries(N/2,d+1/2.,g+1/2.,D,G)
-    cmodes = zeros(ceil((N+1.)/2),dtype='complex128')
-    smodes = zeros(N/2,dtype='complex128')
+    cconnect = jconnection_entries((N+2)/2,delta-1/2.,gamma-1/2.,D,G)
+    sconnect = jconnection_entries(N/2,delta+1/2.,gamma+1/2.,D,G)
+    cmodes = zeros(ceil((N+1.)/2),dtype=complex)
+    smodes = zeros(N/2,dtype=complex)
     NEven = not(N%2)
     # location of mode 0
     Nmiddle = N/2
@@ -110,12 +134,8 @@ def int_connection_overhead(N,g,d,G,D):
 # Applies the connection matrices returned by int_connection_overhead to
 # perform the fft.
 def int_connection_online(modes,matrices):
-    from spyctral.jfft import rmatrix_entries_apply as jconnection_apply
+    from spyctral.jacobi.jfft import rmatrix_entries_apply as jconnection_apply
     from numpy import sqrt,zeros,hstack,flipud
-    # ONLY USE THE FOLLOWING LINE FOR C/FORTRAN TIMINGS
-    #from jfft_helpers import rmatrixapply as jconnection_apply
-    #from jfft_helpers import rmatrixapplyfast as jconnection_apply
-    #from FourierHelpers import rmatrixapplyfourier as jconnection_apply
 
     if matrices[0].shape[1]>1:
         N = modes.shape[0]
@@ -136,10 +156,10 @@ def int_connection_online(modes,matrices):
         matrices[3] = 1/2.*(modes[(Nmiddle+1):] - matrices[3])
 
         ### connection ###
-        #matrices[2] = jconnection_apply(matrices[2],matrices[0])
-        #matrices[3] = jconnection_apply(matrices[3],matrices[1])
-        [matrices[2],matrices[3]] = jconnection_apply(matrices[2],matrices[0],\
-                                    matrices[3],matrices[1])
+        matrices[2] = jconnection_apply(matrices[2],matrices[0])
+        matrices[3] = jconnection_apply(matrices[3],matrices[1])
+        #[matrices[2],matrices[3]] = jconnection_apply(matrices[2],matrices[0],\
+        #                            matrices[3],matrices[1])
 
         #### sc_expand ###
         modes[Nmiddle] = matrices[2][0]*sqrt(2)
@@ -161,7 +181,7 @@ def int_connection_online(modes,matrices):
         #return modes
 
 def int_connection_backward_online(modes,matrices):
-    from spyctral.jfft import rmatrix_entries_invert as jconnection_apply
+    from spyctral.jacobi.jfft import rmatrix_entries_invert as jconnection_apply
 
     if matrices[0].shape[1]>1:
         N = modes.shape[0]
@@ -177,6 +197,7 @@ def int_connection_backward_online(modes,matrices):
 
 
 
+"""
 ###################### DEPRECATED ######################
 
 # Helper function: collapses to even modes
@@ -205,3 +226,4 @@ def c_expand(modes,N):
 def s_expand(modes,N):
     factor = modes.size - (1+(-1)**N)/2
     return _np.hstack((-modes[::-1],_np.array([0.]),modes[:factor]))
+"""

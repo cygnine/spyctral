@@ -6,6 +6,8 @@
 import eval
 import quad
 import weights
+import connection
+import fft
 
 #import genfourier
 #import connection

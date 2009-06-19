@@ -6,35 +6,6 @@
 __all__ = ['gquad',
            'genfourier_gquad']
 
-"""
-# Returns N k-indices, using the default standard bias (to the
-# left/negative if N is even)
-def N_to_ks(N):
-
-    from numpy import arange
-
-    N = int(N)
-    if bool(N%2):
-        N = (N-1)/2
-        ks = arange(-N,N+1)
-    else:
-        N = N/2
-        ks = arange(-N,N)
-
-    return ks
-
-# Returns the default Fourier quadrature rule over the interval (-pi*scale,
-# pi*scale) + shift
-def gquad(N,scale=0.,shift=0.) :
-    
-    x = _np.linspace(-pi,pi,N+1)
-    x = x[:N] + 1./2*(x[1]-x[0])
-
-    w = 2*pi/N*_np.ones(x.shape)
-
-    return [x,w]
-"""
-
 # Returns generalized Szego-Fourier qudarature rules over the interval (-pi,pi).
 # The rules are constructed for the unweighted functions, and with the intent
 # that they will eventually be mapped to the real line so that we try not to
@@ -42,9 +13,9 @@ def gquad(N,scale=0.,shift=0.) :
 def gq(N,gamma=0.,delta=0.,shift=0.,scale=1.):
 
     from numpy import arccos, hstack, isnan
-    from pyspec.jacobi.quad import gq as jgq
-    from pyspec.jacobi.quad import grq as jgrq
-    from pyspec.common.maps import physical_scaleshift as pss
+    from spyctral.jacobi.quad import gq as jgq
+    from spyctral.jacobi.quad import grq as jgrq
+    from spyctral.common.maps import physical_scaleshift as pss
 
     N = int(N)
     tol = 1e-8
@@ -79,6 +50,6 @@ def gq(N,gamma=0.,delta=0.,shift=0.,scale=1.):
 # Returns the Szego-Fourier quadrature for the weighted functions
 def pgq(N,gamma=0.,delta=0.,shift=0.,scale=1.):
 
-    from weights import w as weight
+    from weights import weight
     [theta,w] = gq(N,gamma,delta,shift=shift,scale=scale)
     return [theta,w/weight(theta,gamma,delta,shift=shift,scale=scale)*scale]
