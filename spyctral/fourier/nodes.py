@@ -6,8 +6,8 @@ __all__ = []
 # Gaussian nodes x satisfy |x|<=L
 def scale_nodes(L,N,delta=0.5,g=0.,d=0.):
 
-    from quad import genfourier_gquad as gq
-    from spyctral.common import scale_factor
+    from quad import gq
+    from spyctral.scaling import scale_factor
 
     [x,w] = gq(N,g=g,d=d)
 

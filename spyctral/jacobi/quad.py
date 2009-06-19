@@ -41,7 +41,7 @@ def grq(N,alpha=-1/2.,beta=-1/2.,r0=None,shift=0.,scale=1.) :
     from spyctral.common.maps import standard_scaleshift as sss
 
     if r0 is None:
-        r0 = [-scale]
+        r0 = [-scale+shift]
 
     r0 = array(r0)
 
@@ -69,7 +69,7 @@ def glq(N,alpha=-1/2.,beta=-1/2.,r0=None,shift=0.,scale=1.) :
     from spyctral.common.maps import standard_scaleshift as sss
 
     if r0 is None:
-        r0 = [-scale,scale]
+        r0 = array([-scale,scale])+shift
 
     r0 = array(r0)
     tol = 1e-12;

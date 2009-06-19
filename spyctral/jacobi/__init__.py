@@ -5,4 +5,5 @@
 #from jacobi import *
 import eval
 import quad
+import weights
 import jfft
