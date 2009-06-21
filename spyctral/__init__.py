@@ -5,3 +5,4 @@ import jacobi
 import fourier
 import wiener
 import mapjpoly
+import hermite

@@ -22,9 +22,9 @@ def jpoly(x,n,alpha=-1/2.,beta=-1/2.,d=0, normalization='normal',scale=1., shift
     """
     from numpy import array, ndarray, ones, sqrt
     from coeffs import recurrence_range
-    from pyspec.opoly1.eval import eval_opoly, eval_normalized_opoly
-    from pyspec.common.maps import physical_scaleshift as pss
-    from pyspec.common.maps import standard_scaleshift as sss
+    from spyctral.opoly1d.eval import eval_opoly, eval_normalized_opoly
+    from spyctral.common.maps import physical_scaleshift as pss
+    from spyctral.common.maps import standard_scaleshift as sss
 
     x = array(x)
     if all([type(n) != test for test in [list,ndarray]]):
