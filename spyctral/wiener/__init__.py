@@ -7,8 +7,9 @@ import maps
 import quad
 import eval
 import coeffs
+import mats
+import nodes
 #import modes
-#import nodes
 #import fft
 
 #from coeffs import *

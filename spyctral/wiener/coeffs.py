@@ -2,11 +2,11 @@
 
 import numpy as _np
 
-__all__ = ['genwienerw_stiff']
+#__all__ = ['genwienerw_stiff']
 
 # Returns constants for representing -s/(x-i)*phi_k^(s) in terms of the phik.
 # Each row contains six columns: kvee, -kvee, k, -k, kwedge, -kwedge
-def genwienerw_lemma1_entries(ks,s=1.,t=0.):
+def weighted_wiener_lemma1_entries(ks,s=1.,t=0.):
 
     from numpy import sign as sgn
 
@@ -44,7 +44,7 @@ def genwienerw_lemma1_entries(ks,s=1.,t=0.):
 
 # Returns constants for the unweighted Wiener function stiffness matrix
 # Each row contains six columns: kvee, -kvee, k, -k, kwedge, -kwedge
-def genwiener_stiff_entries(ks,s=1.,t=0.):
+def wiener_stiff_entries(ks,s=1.,t=0.):
 
     import spyctral.opoly1d.jacobi as jac
     from numpy import sign as sgn
@@ -97,7 +97,7 @@ def genwiener_stiff_entries(ks,s=1.,t=0.):
 
 # Returns constants for the weighted Wiener function stiffness matrix
 # Each row contains six columns: kvee, -kvee, k, -k, kwedge, -kwedge
-def genwienerw_stiff_entries(ks,s=1.,t=0.,scale=1.):
+def wieghted_wiener_stiff_entries(ks,s=1.,t=0.,scale=1.):
 
     from numpy import sign as sgn
     from numpy import sqrt
@@ -151,70 +151,9 @@ def genwienerw_stiff_entries(ks,s=1.,t=0.,scale=1.):
 
     return entries/scale
 
-# Generates the NxN stiffness matrix for weighted Wiener functions (for N even,
-# the indices are negatively-biased)
-# Returns a sparse CSR matrix
-def genwienerw_stiff(N,s=1.,t=0.,scale=1.):
-
-    #from numpy import sign as sgn
-    from scipy import sparse
-
-    def sgn(x):
-        return (x==0)+_np.sign(x)
-
-    N = int(N)
-    if bool(N%2):
-        k = (N-1)/2
-        ks = range(-k,k+1)
-        kbottom = -k
-    else:
-        k = N/2
-        ks = range(-k,k)
-        kbottom = -k
-
-    entries = genwienerw_stiff_entries(ks,s,t,scale=scale)
-    I = []
-    J = []
-    V = []
-
-    stiff = _np.zeros([N,N])
-    kcount = 0
-    for k in ks:
-        kvee = sgn(k)*(_np.abs(k)-1)
-        kwedge = sgn(k)*(_np.abs(k)+1)
-        kinds = list(_np.array([kvee,-kvee,k,-k,kwedge,-kwedge])-kbottom)
-        thisk = k-kbottom
-        lcount = 0
-        rowks = []
-        colks = []
-        es = []
-
-        for l in kinds:
-            if 0<=l<=N-1:
-                rowks.append(thisk)
-                es.append(entries[k-kbottom,lcount])
-                colks.append(kinds[lcount])
-            #else:
-                #colks.pop(lcount)
-                #kinds.pop(lcount)
-            lcount += 1
-
-        map(I.append,rowks)
-        map(J.append,colks)
-        map(V.append,list(es))
-
-
-    I = _np.array(I)
-    J = _np.array(J)
-    V = _np.array(V)
-    # Actually, since defintion of stiffness matrix is <phi,dphi>, the I's are
-    # column indices, and the J's are row indices
-    return sparse.coo_matrix((V,(J,I)),shape=(N,N)).tocsr()
-    #return [rowks,colks,es]
-
 # Function that calculates overhead for applying the 
 # stiffness matrix for the weighted Wiener rational functions. The
-# coefficients should be the output of genwienerw_stiff_entries.
+# coefficients should be the output of weighted_wiener_stiff_entries.
 def apply_stiff_entries_overhead(N,s=1.,t=0.,scale=1.):
 
     print """This function is not supported due to the efficiency of the CSR
@@ -225,7 +164,7 @@ def apply_stiff_entries_overhead(N,s=1.,t=0.,scale=1.):
     ks = N_to_ks(N)
 
     # Generate the coefficients
-    entries = genwienerw_stiff_entries(ks,s=s,t=t,scale=scale)
+    entries = weighted_wiener_stiff_entries(ks,s=s,t=t,scale=scale)
 
     # Generate necessary maps to appl
     if entries.size[0] != N:
