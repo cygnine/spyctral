@@ -97,7 +97,7 @@ def wiener_stiff_entries(ks,s=1.,t=0.):
 
 # Returns constants for the weighted Wiener function stiffness matrix
 # Each row contains six columns: kvee, -kvee, k, -k, kwedge, -kwedge
-def wieghted_wiener_stiff_entries(ks,s=1.,t=0.,scale=1.):
+def weighted_wiener_stiff_entries(ks,s=1.,t=0.,scale=1.):
 
     from numpy import sign as sgn
     from numpy import sqrt
