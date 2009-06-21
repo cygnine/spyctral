@@ -42,7 +42,7 @@ def dr_dx(x,scale=1.,shift=0.):
 def sqrt_dr_dx(x,scale=1.,shift=0.):
     from numpy import sqrt
 
-    return sqrt(drdx(x,scale=scale,shift=shift))
+    return sqrt(dr_dx(x,scale=scale,shift=shift))
 
 # Jacobian dx/dr(r):
 def dx_dr(r,scale=1.,shift=0.):
@@ -54,8 +54,8 @@ def dx_dr(r,scale=1.,shift=0.):
 # evaluated as a function of x
 # wjacobi
 def jacobi_weight(x,s=1.,t=1.,scale=1.,shift=0.):
-    [alpha,beta] = sttoab(s,t)
-    r = xtor(x,scale=scale,shift=shift)
+    [alpha,beta] = st_to_ab(s,t)
+    r = x_to_r(x,scale=scale,shift=shift)
     return ((1-r)**alpha) * ((1+r)**beta)
 
 # Returns the square root of the Jacobi polynomials weight function of
@@ -63,8 +63,8 @@ def jacobi_weight(x,s=1.,t=1.,scale=1.,shift=0.):
 # sqrt_wjacobi
 def sqrt_jacobi_weight(x,s=1.,t=1.,scale=1.,shift=0.):
 
-    [alpha,beta] = sttoab(s,t)
-    r = xtor(x,scale=scale,shift=shift)
+    [alpha,beta] = st_to_ab(s,t)
+    r = x_to_r(x,scale=scale,shift=shift)
     return ((1-r)**(alpha/2.)) * ((1+r)**(beta/2.))
 
 # Returns the weighed Jacobi polynomial weight function of class
@@ -73,7 +73,7 @@ def sqrt_jacobi_weight(x,s=1.,t=1.,scale=1.,shift=0.):
 # wjacobiw
 def weight(x,s=1.,t=1.,scale=1.,shift=0.):
 
-    return wjacobi(x,s=s,t=t,scale=scale,shift=shift)*drdx(x,scale=scale,shift=shift)
+    return jacobi_weight(x,s=s,t=t,scale=scale,shift=shift)*dr_dx(x,scale=scale,shift=shift)
 
 # Returns the square root of the weighted Jacobi polynomial weight
 # function of class (alpha,beta). The primary use of this is in the
@@ -82,8 +82,8 @@ def weight(x,s=1.,t=1.,scale=1.,shift=0.):
 # sqrt_wjacobiw
 def sqrt_weight(x,s=1.,t=1.,scale=1.,shift=0.):
 
-    return sqrt_wjacobi(x,s=s, t=t,scale=scale,shift=shift)*\
-            sqrt_drdx(x,scale=scale,shift=shift)
+    return sqrt_jacobi_weight(x,s=s, t=t,scale=scale,shift=shift)*\
+            sqrt_dr_dx(x,scale=scale,shift=shift)
 
 # Returns the derivative of the square root weight function: used in
 # construction of the derivative of the weighted functions
@@ -92,8 +92,8 @@ def dsqrt_weight(x,s=1.,t=1.,scale=1.,shift=0.):
 
     from numpy import sqrt
 
-    [a,b] = sttoab(s,t)
-    r = xtor(x,scale=scale,shift=shift)
+    [a,b] = st_to_ab(s,t)
+    r = x_to_r(x,scale=scale,shift=shift)
 
     factor = -(a/2.+3/4.)*(1+r) + (b/2.+3/4.)*(1-r)
     # Jacobian for scaling:
@@ -102,4 +102,4 @@ def dsqrt_weight(x,s=1.,t=1.,scale=1.,shift=0.):
     xt = x.copy()
     sss(xt,scale=scale,shift=shift)
 
-    return factor/sqrt(1+xt**2)*sqrt_wjacobiw(x,s=s,t=t,scale=scale,shift=shift)
+    return factor/sqrt(1+xt**2)*sqrt_weight(x,s=s,t=t,scale=scale,shift=shift)

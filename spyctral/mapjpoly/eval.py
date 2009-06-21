@@ -14,7 +14,7 @@
 # weight function maps.wjacobiw
 # jfunn
 def jacobi_function(x,ns,s=1.,t=1.,scale=1.,shift=0.):
-    from spyctral.opoly1d.jacobi import jpoly
+    from spyctral.jacobi.eval import jpoly
     from spyctral.mapjpoly.maps import x_to_r, st_to_ab
     [alpha,beta] = st_to_ab(s,t)
 
@@ -25,7 +25,7 @@ def jacobi_function(x,ns,s=1.,t=1.,scale=1.,shift=0.):
 # weight function maps.wjacobiw
 # djfunn
 def djacobi_function(x,ns,s=1.,t=1.,scale=1.,shift=0.):
-    from spyctral.opoly1d.jacobi import djpoly
+    from spyctral.jacobi.eval import djpoly
     from spyctral.mapjpoly.maps import x_to_r, st_to_ab, dr_dx
     [alpha,beta] = st_to_ab(s,t)
 

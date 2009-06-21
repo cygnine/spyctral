@@ -10,15 +10,15 @@
 def gq(N,s=1.,t=1.,scale=1.,shift=0.):
     from spyctral.common.maps import physical_scaleshift as pss
     from spyctral.mapjpoly.maps import st_to_ab, r_to_x
-    from spyctral.opoly1d.jacobi.quad import gq
+    from spyctral.jacobi.quad import gq
 
     [alpha,beta]=st_to_ab(s,t)
-    [r,w] = gq(N,a=alpha,b=beta)
+    [r,w] = gq(N,alpha=alpha,beta=beta)
     x = r_to_x(r)
 
     #x *= scale 
     #x += shift
-    pss(x)
+    pss(x,scale=scale,shift=shift)
     return [x,w]
 
 def pgq(N,s=1.,t=1.,scale=1.,shift=0.):
