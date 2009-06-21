@@ -7,7 +7,7 @@ import maps
 import quad
 import eval
 import coeffs
-import mats
+import matrices
 import nodes
 #import modes
 import fft
