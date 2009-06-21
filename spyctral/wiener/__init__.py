@@ -10,7 +10,7 @@ import coeffs
 import mats
 import nodes
 #import modes
-#import fft
+import fft
 
 #from coeffs import *
 

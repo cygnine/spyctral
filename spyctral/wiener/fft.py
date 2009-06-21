@@ -1,45 +1,43 @@
 # FFT module for wiener function package
 
-__all__ = []
-
-import numpy as _np
-import scipy as _sp
+#__all__ = []
 
 # Uses the FFT to compute a modal expansion in the weighted generalized
 # Wiener rational functions 
-def fft_nodes_to_modes(f,s=1.,t=0.,shift=0.,scale=1.):
+def fft_collocation(f,s=1.,t=0.,shift=0.,scale=1.):
 
     from spyctral.fourier.fft import fft as fft_Psi
     from wienerfun.eval import wx_sqrt
     from wienerfun.quad import genwiener_gquad as gq
+    from numpy import sqrt
 
     # This stuff can all be overhead
     N = f.size
     x = gq(N,s=1.,t=0.,shift=shift,scale=scale)[0]
     modes = f/wx_sqrt(x,s=s,t=t,shift=shift,scale=scale)
 
-    temp = fft_Psi(modes,g=s-1.,d=t)*_np.sqrt(scale)
+    temp = fft_Psi(modes,gamma=s-1.,delta=t)*sqrt(scale)
     temp[-s:] = 0
     temp[:s] = 0
 
     return temp
 
 # Function that computes overhead stuff for FFT
-def fft_nodes_to_modes_overhead(N,s=1.,t=0.,shift=0.,scale=1.):
+def fft_collocation_overhead(N,s=1.,t=0.,shift=0.,scale=1.):
 
     from numpy import sqrt
     from spyctral.fourier.fft import fft_overhead
     from wienerfun.eval import wx_sqrt
     from wienerfun.quad import genwiener_gquad as gq
 
-    overhead = fft_overhead(N,g=s-1.,d=t)
+    overhead = fft_overhead(N,gamma=s-1.,delta=t)
     x = gq(N,s=1.,t=0.,shift=shift,scale=scale)[0]
     premult = sqrt(scale)/wx_sqrt(x,s=s,t=t,shift=shift,scale=scale)
 
     return [premult,overhead]
 
 # Function that does all the online fft computations
-def fft_nodes_to_modes_online(f,overhead):
+def fft_collocation_online(f,overhead):
 
     from spyctral.fourier.fft import fft_online
 
@@ -53,12 +51,11 @@ def fft_nodes_to_modes_online(f,overhead):
     return temp
 
 # DOES NOT DO t>0 !!!!!
-def fft_nodes_to_modes_galerkin(f,s=1.,t=0.,shift=0.,scale=1.):
+def fft_galerkin(f,s=1.,t=0.,shift=0.,scale=1.):
 
     from spyctral.fourier.fft import fft as fft_Psi
     from spyctral.fourier.connection import int_connection as connect
     from numpy import sqrt,ones,abs,array
-    from misc import pascal_row
     N = len(f)
 
     modes = fft_Psi(f)
@@ -71,18 +68,12 @@ def fft_nodes_to_modes_galerkin(f,s=1.,t=0.,shift=0.,scale=1.):
             modes[N-count-2] -= modes[N-count-1]
     modes *= 2**(s/2.)/(1j)**s
 
-    # This way sucks
-    #srow = array(pascal_row(s+1),dtype='complex128')
-    #for count in range(int(s)-1):
-    #    modes[N-count-2] -= sum(modes[N-count-1:]*srow[1:count+2])
-    #for count in range(N-int(s)-1,-1,-1):
-    #    modes[count] -= sum(modes[count+1:(count+s+1)]*srow[1:])
-
     modes = connect(modes,0,0,int(s-1),int(t))
     modes[:s] = 0
     modes[-s:] = 0
     return modes*sqrt(scale)
 
+"""
 # Function that computes overhead stuff for FFT
 def fft_galerkin_overhead(N,s=1.,t=0.,shift=0.,scale=1.):
     from numpy import sqrt
@@ -96,7 +87,6 @@ def fft_galerkin_overhead(N,s=1.,t=0.,shift=0.,scale=1.):
     return [premult,foverhead,coverhead,int(s)]
 
 # Function that does all the online fft computations
-"""
 def fft_galerkin_online(f,overhead):
     from spyctral.fourier.fft import fft_online
     from spyctral.fourier.connection import int_connection_online as connect
@@ -125,11 +115,12 @@ def fft_galerkin_online(f,overhead):
 
 # Uses the FFT to compute nodal evaluations given a modal expansion for
 # the generalized Wiener rational functions
-def fft_modes_to_nodes(F,s=1.,t=0.,shift=0.,scale=1.):
+def ifft_collocation(F,s=1.,t=0.,shift=0.,scale=1.):
 
     from spyctral.fourier.fft import ifft as ifft_Psi
     from wienerfun.eval import wx_sqrt
     from wienerfun.quad import genwiener_gquad as gq
+    from numpy import sqrt
 
     from spyctral.fourier.fft import fft_overhead, ifft_online
 
@@ -137,11 +128,10 @@ def fft_modes_to_nodes(F,s=1.,t=0.,shift=0.,scale=1.):
 
     #overhead = fft_overhead(N,g=s-1.,d=t)
     #fx = ifft_online(f,overhead)
-    fx = ifft_Psi(F,g=s-1.,d=t)
-    #fx = _np.zeros(N)
+    fx = ifft_Psi(F,gamma=s-1.,delta=t)
     
     x = gq(N,s=1.,t=0.,shift=shift,scale=scale)[0]
-    fx *= wx_sqrt(x,s=s,t=t,shift=shift,scale=scale)/_np.sqrt(scale)
+    fx *= wx_sqrt(x,s=s,t=t,shift=shift,scale=scale)/sqrt(scale)
     #print "hi"
 
     return fx
@@ -149,7 +139,7 @@ def fft_modes_to_nodes(F,s=1.,t=0.,shift=0.,scale=1.):
 # Function that does all the online stuff for ifft: the overhead is what
 # is output from fft_modes_to_nodes_overhead: instead of multiplying by
 # it, we'll just divide by it.
-def fft_modes_to_nodes_online(f,overhead):
+def ifft_collocation_online(f,overhead):
 
     from spyctral.fourier.fft import ifft_online
 

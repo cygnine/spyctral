@@ -31,7 +31,7 @@ def int_connection(modes,gamma=0.,delta=0.,G=0,D=0):
 
         return sc_expand(cmodes,smodes,N)
     else:
-        return modescopy
+        return modes.copy()
 
 
 def int_connection_backward(modes,gamma=0.,delta=0.,G=0,D=0):
@@ -57,7 +57,7 @@ def int_connection_backward(modes,gamma=0.,delta=0.,G=0,D=0):
         
         return sc_expand(cmodes,smodes,N)
     else:
-        return modescopy
+        return modes.copy()
 
 def sc_collapse(modes,N):
     """
