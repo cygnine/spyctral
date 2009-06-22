@@ -13,7 +13,7 @@ from spyctral.common.maps import physical_scaleshift as pss
 
 # Maps the indices (s,t) to (alpha,beta)
 def st_to_ab(s,t):
-    return [(2*s-3)/2.,(2*t-3)/2]
+    return [(2*s-3)/2.,(2*t-3)/2.]
 
 # Map x -----> r(x)
 def x_to_r(x,scale=1.,shift=0.):
