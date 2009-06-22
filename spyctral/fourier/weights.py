@@ -14,8 +14,8 @@
 # Defines the Szego-Fourier weight
 def weight(theta,gamma=0.,delta=0.,shift=0.,scale=1.):
     from numpy import array, cos
-    from pyspec.common.maps import standard_scaleshift as sss
-    from pyspec.common.maps import physical_scaleshift as pss
+    from spyctral.common.maps import standard_scaleshift as sss
+    from spyctral.common.maps import physical_scaleshift as pss
 
     theta = array(theta)
     sss(theta,scale=scale,shift=shift)
@@ -26,8 +26,8 @@ def weight(theta,gamma=0.,delta=0.,shift=0.,scale=1.):
 # Defines the conjugate-biased square-root weight function for the Szego-Fourier basis sets
 def sqrt_weight_bias(theta,gamma=0.,delta=0.,shift=0.,scale=1.):
     from numpy import cos, sin, exp
-    from pyspec.common.maps import standard_scaleshift as sss
-    from pyspec.common.maps import physical_scaleshift as pss
+    from spyctral.common.maps import standard_scaleshift as sss
+    from spyctral.common.maps import physical_scaleshift as pss
     from scipy import pi
     from scipy import power as pw
 
@@ -45,8 +45,8 @@ def sqrt_weight_bias(theta,gamma=0.,delta=0.,shift=0.,scale=1.):
 # sin(theta/2.)
 def dsqrt_weight_bias(theta,gamma=0.,delta=0.,shift=0.,scale=1.):
     from numpy import cos, sin, exp, abs
-    from pyspec.common.maps import standard_scaleshift as sss
-    from pyspec.common.maps import physical_scaleshift as pss
+    from spyctral.common.maps import standard_scaleshift as sss
+    from spyctral.common.maps import physical_scaleshift as pss
     from scipy import pi
 
     sss(theta,scale=scale,shift=shift)

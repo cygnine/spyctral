@@ -13,9 +13,9 @@ import numpy as _np
 def eval_opoly(x,n,a,b,d=[0]):
     from numpy import array, max, zeros
     from scipy import factorial
-    from pyspec.common.typechecks import TestListType
+    #from pyspec.common.typechecks import TestListType
 
-    map(TestListType,[x,n,a,b], ['x','n','a','b'])
+    #map(TestListType,[x,n,a,b], ['x','n','a','b'])
 
     # Preprocessing: unravel x and n arrays
     x = array(x).ravel()
@@ -62,9 +62,9 @@ def eval_normalized_opoly(x,n,a,b,d=[0]):
 
     from numpy import array, max, zeros, sqrt, prod
     from scipy import factorial
-    from pyspec.common.typechecks import TestListType
+    #from spyctral.common.typechecks import TestListType
 
-    map(TestListType,[x,n,a,b], ['x','n','a','b'])
+    #map(TestListType,[x,n,a,b], ['x','n','a','b'])
 
     # Preprocessing: unravel x and n arrays
     x = array(x).ravel()
