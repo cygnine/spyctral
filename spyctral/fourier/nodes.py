@@ -11,4 +11,4 @@ def scale_nodes(L,N,delta=0.5,g=0.,d=0.):
 
     [x,w] = gq(N,g=g,d=d)
 
-    return scale_factor(L,x,scale=delta)
+    return scale_factor(L,x,delta=delta)
