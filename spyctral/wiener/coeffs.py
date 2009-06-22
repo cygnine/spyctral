@@ -160,8 +160,8 @@ def apply_stiff_entries_overhead(N,s=1.,t=0.,scale=1.):
     matvec routine in scipy. genwienerw_stiff() returns a CSR
     representation of the stiffness matrix"""
 
-    from wienerfun.quad import N_to_ks
-    ks = N_to_ks(N)
+    from spyctral.common.indexing import integer_range
+    ks = integer_range(N)
 
     # Generate the coefficients
     entries = weighted_wiener_stiff_entries(ks,s=s,t=t,scale=scale)

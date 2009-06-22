@@ -60,7 +60,7 @@ def main():
                     "spyctral",
                     "spyctral.fourier",
                     "spyctral.opoly1d",
-                    "spyctral.wienerfun",
+                    "spyctral.wiener",
                     ],
             zip_safe=False,
             )

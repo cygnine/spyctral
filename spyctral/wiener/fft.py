@@ -7,8 +7,8 @@
 def fft_collocation(f,s=1.,t=0.,shift=0.,scale=1.):
 
     from spyctral.fourier.fft import fft as fft_Psi
-    from wienerfun.eval import wx_sqrt
-    from wienerfun.quad import genwiener_gquad as gq
+    from spyctral.wiener.weights import sqrt_weight_bias as wx_sqrt
+    from spyctral.wiener.quad import gq
     from numpy import sqrt
 
     # This stuff can all be overhead
@@ -27,8 +27,8 @@ def fft_collocation_overhead(N,s=1.,t=0.,shift=0.,scale=1.):
 
     from numpy import sqrt
     from spyctral.fourier.fft import fft_overhead
-    from wienerfun.eval import wx_sqrt
-    from wienerfun.quad import genwiener_gquad as gq
+    from spyctral.wiener.weights import sqrt_weight_bias as wx_sqrt
+    from spyctral.wiener.quad import gq
 
     overhead = fft_overhead(N,gamma=s-1.,delta=t)
     x = gq(N,s=1.,t=0.,shift=shift,scale=scale)[0]
@@ -118,8 +118,8 @@ def fft_galerkin_online(f,overhead):
 def ifft_collocation(F,s=1.,t=0.,shift=0.,scale=1.):
 
     from spyctral.fourier.fft import ifft as ifft_Psi
-    from wienerfun.eval import wx_sqrt
-    from wienerfun.quad import genwiener_gquad as gq
+    from spyctral.wiener.weights import sqrt_weight_bias as wx_sqrt
+    from spyctral.wiener.quad import gq
     from numpy import sqrt
 
     from spyctral.fourier.fft import fft_overhead, ifft_online
