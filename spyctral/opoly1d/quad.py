@@ -6,7 +6,7 @@ __all__ = ['opoly_gq', 'opoly_grq', 'opoly_glq']
 
 from numpy import array, sqrt, diag, dot
 from numpy.linalg import eigh, inv
-from opoly1 import eval_opoly
+from spyctral.opoly1d.eval import eval_opoly
 import numpy as np
 #from scipy import sparse
 
@@ -43,7 +43,7 @@ def grq(a,b,r0=-1.) :
 # input r0 denotes the fixed Radau point. N is the length of the recurrence
 # constant vectors.
    
-    from eval import eval_opoly
+    from spyctral.opoly1d.eval import eval_opoly
 
     a = array(a);
     b = array(b);
@@ -69,7 +69,7 @@ def grq(a,b,r0=-1.) :
 def glq(a,b,r0=[-1.,1.]) :
     from numpy import array, dot
     from numpy.linalg import inv
-    from eval import eval_opoly
+    from spyctral.opoly1d.eval import eval_opoly
 
     # Still have to do argument checking:
     a = array(a);

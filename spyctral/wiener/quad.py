@@ -31,7 +31,7 @@ def N_to_ks(N):
 
 # Returns the `Gauss' quadrature formula for the unweighted functions:
 def gq(N,s=1.,t=0,shift=0.,scale=1.):
-    from spyctral.fourier.quad import genfourier_gquad as gq
+    from spyctral.fourier.quad import gq
     from maps import theta_to_x
 
     [theta,w] = gq(N,s-1.,t)
