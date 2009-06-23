@@ -30,3 +30,22 @@ def integer_range(N):
         ks = arange(-N,N)
 
     return ks
+
+def whole_etas(N):
+    """Returns eta indicators for modal indices: these are the indicators for
+    input into spectral filter methods"""
+
+    Ns = whole_range(N)
+    return Ns/float(N-1)
+
+def integer_etas(N):
+    """Returns eta indicators for modal indices: these are the indicators for
+    input into spectral filter methods"""
+
+    ks = integer_range(N)
+    if bool(N%2):
+        N = (N-1)/2
+    else:
+        N = N/2
+    
+    return ks/float(N)
