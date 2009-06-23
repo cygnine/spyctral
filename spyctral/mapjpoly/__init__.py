@@ -6,6 +6,7 @@
 import eval
 import quad
 import maps
+import nodes
 #import modes
 #import nodes
 #import fft
