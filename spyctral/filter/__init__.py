@@ -18,5 +18,7 @@ def filter_parse(filter_type):
         return raised_cosine
     elif filter_type == 'cesaro':
         return cesaro
-    else:
+    elif filter_type is None:
         return None
+    else:
+        raise ValueError('Invalid filter type')
