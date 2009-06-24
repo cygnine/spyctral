@@ -6,3 +6,4 @@ import fourier
 import wiener
 import mapjpoly
 import hermite
+import filter
