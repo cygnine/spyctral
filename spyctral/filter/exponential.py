@@ -11,10 +11,10 @@ def modal_weights(etas,alpha=-log(1e-10),p=8.,eta_cutoff=0.5):
 
     # Flags for preservation
     etas = abs(etas)
-    pflags = etas<=etac
+    pflags = etas<=eta_cutoff
 
     coeffs = ones(etas.size)
 
-    factor = -alpha*( (etas[~pflags]-etac)/(1-etac) )**p
+    factor = -alpha*( (etas[~pflags]-eta_cutoff)/(1-eta_cutoff) )**p
     coeffs[~pflags] = exp(factor)
     return coeffs
