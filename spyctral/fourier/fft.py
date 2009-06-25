@@ -16,7 +16,7 @@ def fft(fx,gamma=0,delta=0,scale=1):
     from connection import int_connection
 
     N = fx.size
-    if fx.dtype is object:
+    if fx.dtype==object:
         modes = pyfft.fft(fx)*sqrt(2*pi)/N
     else:
         modes = ft(fx)*sqrt(2*pi)/N
@@ -54,7 +54,7 @@ def ifft(f,gamma=0.,delta=0.,scale=1.):
 
     fx = roll(fx,-(N-1)/2)
 
-    if fx.dtype is object:
+    if fx.dtype==object:
         return N/sqrt(2*pi)*ift(fx)
     else:
         return 1/sqrt(2*pi)*pyfft.fft(fx,sign=-1)
@@ -92,7 +92,7 @@ def fft_online(fx,overhead):
     import spyctral.common.fft as pyfft
     from connection import int_connection_online as int_connection
 
-    if fx.dtype is object:
+    if fx.dtype==object:
         modes = pyfft.fft(fx)
     else:
         modes = ft(fx)
@@ -120,7 +120,7 @@ def ifft_online(f,overhead):
 
     fx = roll(fx,-(N/2))
 
-    if fx.dtype is object:
+    if fx.dtype==object:
         return pyfft.fft(fx,sign=-1)/N
     else:
         return ift(fx)
