@@ -8,6 +8,7 @@ import quad
 import eval
 import coeffs
 import matrices
+import operators
 import nodes
 #import modes
 import fft
