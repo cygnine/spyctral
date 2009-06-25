@@ -1,7 +1,7 @@
 # Generates the NxN stiffness matrix for weighted Wiener functions (for N even,
 # the indices are negatively-biased)
 # Returns a sparse CSR matrix
-def weighted_wiener_stiffness_matrix(N,s=1.,t=0.,scale=1.):
+def weighted_wiener_stiffness_matrix(N,s=1.,t=0.,scale=1.,shift=0.):
     from spyctral.wiener.coeffs import weighted_wiener_stiff_entries
     from numpy import zeros, array, sign, abs
     from scipy import sparse
