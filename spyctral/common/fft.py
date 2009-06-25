@@ -82,7 +82,7 @@ def test_with_floats():
 
 
 
-
+"""
 from pymbolic.mapper import IdentityMapper
 class NearZeroKiller(IdentityMapper):
     def map_constant(self, expr):
@@ -135,3 +135,4 @@ def test_with_pymbolic():
 if __name__ == "__main__":
     test_with_floats()
     test_with_pymbolic()
+"""

@@ -9,13 +9,17 @@ __all__ = []
 def fft(fx,gamma=0,delta=0,scale=1):
     from numpy import sqrt, roll, arange, exp, sign
     from numpy.fft import fft as ft
+    import spyctral.common.fft as pyfft
     from scipy import pi
     from spyctral.common.indexing import integer_range
 
     from connection import int_connection
 
     N = fx.size
-    modes = ft(fx)*sqrt(2*pi)/N
+    if fx.dtype is object:
+        modes = pyfft.fft(fx)*sqrt(2*pi)/N
+    else:
+        modes = ft(fx)*sqrt(2*pi)/N
 
     ks = integer_range(N)
 
@@ -33,6 +37,7 @@ def fft(fx,gamma=0,delta=0,scale=1):
 def ifft(f,gamma=0.,delta=0.,scale=1.):
     from numpy import sqrt, roll, arange, exp, sign
     from numpy.fft import ifft as ift
+    import spyctral.common.fft as pyfft
     from scipy import pi
     from spyctral.common.indexing import integer_range
     from connection import int_connection_backward
@@ -49,7 +54,11 @@ def ifft(f,gamma=0.,delta=0.,scale=1.):
 
     fx = roll(fx,-(N-1)/2)
 
-    return N/sqrt(2*pi)*ift(fx)
+    if fx.dtype is object:
+        return N/sqrt(2*pi)*ift(fx)
+    else:
+        return 1/sqrt(2*pi)*pyfft.fft(fx,sign=-1)
+
 
 # Combines overhead calculations needed to perform fft
 def fft_overhead(N,gamma=0.,delta=0.,scale=1.):
@@ -67,7 +76,7 @@ def fft_overhead(N,gamma=0.,delta=0.,scale=1.):
     factors = exp(-1j*ks[flags]*pi/N)
     factors2 = -1
 
-    all_factors = ones(N,dtype='complex128')
+    all_factors = ones(N,dtype=complex)
     all_factors[flags] *= factors
     all_factors[flags2] *= factors2
     all_factors *= sqrt(2*pi)/N
@@ -80,9 +89,13 @@ def fft_overhead(N,gamma=0.,delta=0.,scale=1.):
 def fft_online(fx,overhead):
     from numpy.fft import fft as ft
     from numpy import roll
+    import spyctral.common.fft as pyfft
     from connection import int_connection_online as int_connection
 
-    modes = ft(fx)
+    if fx.dtype is object:
+        modes = pyfft.fft(fx)
+    else:
+        modes = ft(fx)
     N = fx.size
 
     modes = roll(modes,N/2)
@@ -97,6 +110,7 @@ def ifft_online(f,overhead):
 
     from numpy.fft import ifft as ift
     from numpy import roll
+    import spyctral.common.fft as pyfft
 
     from connection import int_connection_backward_online
 
@@ -106,4 +120,7 @@ def ifft_online(f,overhead):
 
     fx = roll(fx,-(N/2))
 
-    return ift(fx)
+    if fx.dtype is object:
+        return pyfft.fft(fx,sign=-1)/N
+    else:
+        return ift(fx)
