@@ -16,7 +16,7 @@ def fft_collocation(f,s=1.,t=0.,shift=0.,scale=1.):
     x = gq(N,s=1.,t=0.,shift=shift,scale=scale)[0]
     modes = f/wx_sqrt(x,s=s,t=t,shift=shift,scale=scale)
 
-    temp = fft_Psi(modes,gamma=s-1.,delta=t)*sqrt(scale)
+    temp = fft_Psi(modes,gamma=s-1.,delta=t)*float(sqrt(scale))
     temp[-s:] = 0
     temp[:s] = 0
 
@@ -131,7 +131,7 @@ def ifft_collocation(F,s=1.,t=0.,shift=0.,scale=1.):
     fx = ifft_Psi(F,gamma=s-1.,delta=t)
     
     x = gq(N,s=1.,t=0.,shift=shift,scale=scale)[0]
-    fx *= wx_sqrt(x,s=s,t=t,shift=shift,scale=scale)/sqrt(scale)
+    fx *= wx_sqrt(x,s=s,t=t,shift=shift,scale=scale)/float(sqrt(scale))
     #print "hi"
 
     return fx

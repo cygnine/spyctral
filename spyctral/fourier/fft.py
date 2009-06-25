@@ -17,7 +17,7 @@ def fft(fx,gamma=0,delta=0,scale=1):
 
     N = fx.size
     if fx.dtype==object:
-        modes = pyfft.fft(fx)*sqrt(2*pi)/N
+        modes = pyfft.fft(fx)*float(sqrt(2*pi)/N)
     else:
         modes = ft(fx)*sqrt(2*pi)/N
 
@@ -55,7 +55,7 @@ def ifft(f,gamma=0.,delta=0.,scale=1.):
     fx = roll(fx,-(N-1)/2)
 
     if fx.dtype==object:
-        return N/sqrt(2*pi)*ift(fx)
+        return N/float(sqrt(2*pi)*ift(fx))
     else:
         return 1/sqrt(2*pi)*pyfft.fft(fx,sign=-1)
 
@@ -121,6 +121,6 @@ def ifft_online(f,overhead):
     fx = roll(fx,-(N/2))
 
     if fx.dtype==object:
-        return pyfft.fft(fx,sign=-1)/N
+        return pyfft.fft(fx,sign=-1)/float(N)
     else:
         return ift(fx)
