@@ -14,5 +14,11 @@ def fft_nodal_differentiation(fx,**kwargs):
     from spyctral.wiener.fft import ifft_collocation as ifft
 
     stiff = stiffmat(len(fx),**kwargs)
-
-    return ifft(stiff*fft(fx,**kwargs),**kwargs)
+    
+    if fx.dtype==object:
+        from pymbolic.algorithm import csr_matrix_multiply
+        temp = fft(fx,**kwargs)
+        temp = csr_matrix_multiply(stiff,temp)
+        return ifft(temp,**kwargs)
+    else:
+        return ifft(stiff*fft(fx,**kwargs),**kwargs)

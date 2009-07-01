@@ -15,5 +15,3 @@
 import indexing
 import typechecks
 import scaling
-import fft
-import sparse_tools

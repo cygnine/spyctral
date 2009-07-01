@@ -9,7 +9,6 @@ __all__ = []
 def fft(fx,gamma=0,delta=0,scale=1):
     from numpy import sqrt, roll, arange, exp, sign
     from numpy.fft import fft as ft
-    import spyctral.common.fft as pyfft
     from scipy import pi
     from spyctral.common.indexing import integer_range
 
@@ -17,7 +16,8 @@ def fft(fx,gamma=0,delta=0,scale=1):
 
     N = fx.size
     if fx.dtype==object:
-        modes = pyfft.fft(fx)*float(sqrt(2*pi)/N)
+        import pymbolic.algorithm as pyalg
+        modes = pyalg.sym_fft(fx)*float(sqrt(2*pi)/N)
     else:
         modes = ft(fx)*sqrt(2*pi)/N
 
@@ -37,7 +37,6 @@ def fft(fx,gamma=0,delta=0,scale=1):
 def ifft(f,gamma=0.,delta=0.,scale=1.):
     from numpy import sqrt, roll, arange, exp, sign
     from numpy.fft import ifft as ift
-    import spyctral.common.fft as pyfft
     from scipy import pi
     from spyctral.common.indexing import integer_range
     from connection import int_connection_backward
@@ -55,9 +54,10 @@ def ifft(f,gamma=0.,delta=0.,scale=1.):
     fx = roll(fx,-(N-1)/2)
 
     if fx.dtype==object:
-        return N/float(sqrt(2*pi)*ift(fx))
+        import pymbolic.algorithm as pyalg
+        return 1/sqrt(2*pi)*pyalg.sym_fft(fx,sign=-1)
     else:
-        return 1/sqrt(2*pi)*pyfft.fft(fx,sign=-1)
+        return N/float(sqrt(2*pi)*ift(fx))
 
 
 # Combines overhead calculations needed to perform fft
