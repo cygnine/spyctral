@@ -3,41 +3,42 @@ import spyctral
 class SpectralBasis:
     """ The basic class type for all spectral basis expansions. """
 
+    basis_type = None
+    quadrature = None
+    vandermonde = None
+    vandermonde_inverse = None
+    nodal_differentiation_matrix = None
+    parameters = {}
+    indexing_type = None;
+    indexing_function = None;
+    fftable = False
+    fft_initialized= False
+    default_quadrature = lambda N: None
+
     def __init__(self,N=0):
         self.N = N
-        self.basis_type = None
-        self.shift = 0.
-        self.scale = 1.
-        self.quadrature = None
-        self.vandermonde = None
-        self.vandermonde_inverse = None
-        self.nodal_differentiation_matrix = None
-        self.parameters = {}
-        self.indexing_type = None;
-        self.indexing_function = None;
-        self.default_quadrature = lambda N: None
+
 
     def __str__(self):
         return str(self.basis_type) + \
-                " Spectral basis expansion with %d degrees of freedom" % self.N
+                " spectral basis expansion with %d degrees of freedom" % self.N
 
     def __repr__(self):
         return str(self.basis_type) + \
-                " Spectral basis expansion with %d degrees of freedom" % self.N
+                " spectral basis expansion with %d degrees of freedom" % self.N
 
-    def assign_indices(self):
-        """
-        Assigns default indices derived from self.N and self.indexing_type.
-        """
-        if self.indexing_type.lower() == "whole":
-            self.indexing_function = spyctral.common.indexing.whole_range
-        elif self.indexing_type.lower() == "integer":
-            self.indexing_function = spyctral.common.indexing.integer_range
+    def initialize_quadrature(self,interpolation_nodes,quadrature):
+        if interpolation_nodes is None:
+            if quadrature is not None:
+                self.quadrature = quadrature
+            else:
+                self.quadrature = self.default_quadrature(self.N,
+                                    **self.parameters)
+            self.nodes = self.quadrature.nodes
         else:
-            raise ValueError("Error: I did not recognize the indexing type %s"\
-                    % self.indexing_type)
-
-        self.indices = self.indexing_function(self.N)
+            self.nodes = interpolation_nodes
+            # Creates vandermonde and vandermonde_inv by default
+            self.make_nodal_differentiation_matrix()
 
     def make_vandermonde(self):
         """
@@ -46,6 +47,43 @@ class SpectralBasis:
         Vandermonde matrix, stored in self.vandermonde.
         """
         self.vandermonde = self.evaluation(self.nodes,self.indices)
+
+    def initialize_fft(self):
+        """
+        If the basis set supports the FFT, this function performs and stores any
+        overhead required to perform the FFT.
+        """
+        if self.fftable:
+            self.__fft_overhead = self.fft_overhead(self.N,**self.parameters)
+            self.fft_initialized = True
+        else:
+            print "This basis set does not support the FFT\n"
+
+    def fft(self,x):
+        """
+        Takes as input nodal evaluations at the FFT grid points and produced
+        modal coefficients corresponding to the basis expansion.
+        """
+        if self.fftable:
+            if not self.fft_initialized:
+                self.initialize_fft()
+            return self.fft_online(x,**self.parameters)
+        else:
+            print "This basis set does not support the FFT\n"
+            return None
+
+    def ifft(self,x):
+        """
+        Takes as input modal coefficients corresponding to the basis and outputs
+        nodal evaluations at the FFT grid points.
+        """
+        if self.fftable:
+            if not self.fft_initialized:
+                self.initialize_fft()
+            return self.ifft_online(x,**self.parameters)
+        else:
+            print "This basis set does not support the FFT\n"
+            return None
 
     def make_vandermonde_inverse(self):
         """
@@ -66,7 +104,7 @@ class SpectralBasis:
             self.vandermonde_inverse = \
                     (self.vandermonde.T.conj()*self.quadrature.weights);
 
-    def make_differentiation_matrix(self):
+    def make_nodal_differentiation_matrix(self):
         """ 
         Uses the methods self.derivative, self.nodes, and
         self.vandermonde_inverse to construct the nodal differentiation matrix.
@@ -79,15 +117,42 @@ class SpectralBasis:
         self.nodal_differentiation_matrix = dot(self.derivative(self.nodes,self.indices), \
                  self.vandermonde_inverse)
 
+class WholeSpectralBasis(SpectralBasis):
+    """ 
+    SpectralBasis instance for which the modes are indexed as whole numbers
+    """
+
+    def assign_indices(self):
+        """
+        Assigns default whole-number indices derived from self.N
+        """
+        self.indexing_function = spyctral.common.indexing.whole_range
+        self.indices = self.indexing_function(self.N)
+        self.modal_fractions = self.indices/float(self.N-1)
+
+class IntegerSpectralBasis(SpectralBasis):
+    """ 
+    SpectralBasis instance for which the modes are indexed as integers
+    """
+
+    def assign_indices(self):
+        """
+        Assigns default integer-number indices derived from self.N
+        """
+        self.indexing_function = spyctral.common.indexing.integer_range
+        self.indices = self.indexing_function(self.N)
+        self.modal_fractions = self.indices/float(int(self.N)/2)
+
 class QuadratureRule:
     """ The basic class type for all quadrature rule instantiations. """
 
     def __init__(self,N=0):
         self.N = N
-        self.nodes = None
-        self.weights = None
-        self.weight_function = None
-        self.quadrature_type = None
+
+    nodes = None
+    weights = None
+    weight_function = None
+    quadrature_type = None
 
     def __str__(self):
         return str(self.quadrature_type) + \

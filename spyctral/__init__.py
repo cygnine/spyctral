@@ -10,3 +10,4 @@ import filter
 
 from classify import *
 from spyctral.hermite.classify import *
+from spyctral.wiener.classify import *
