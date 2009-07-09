@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: latin-1 -*-
 
-# Spyctrl - the Hybrid'n'Easy DG Environment
+# Spyctral - the SPeCTRAL and high-order methods module
 # Copyright (C) 2009 Akil C. Narayan
 #
 # This program is free software: you can redistribute it and/or modify

@@ -81,58 +81,62 @@ def test_with_floats():
         assert la.norm(f_a-f_a_numpy) < 1e-10
 
 
+try:
+    from pymbolic.mapper import IdentityMapper
+    HAVE_PYMBOLIC = True
+except:
+    pass
 
-"""
-from pymbolic.mapper import IdentityMapper
-class NearZeroKiller(IdentityMapper):
-    def map_constant(self, expr):
-        if isinstance(expr, complex):
-            r = expr.real
-            i = expr.imag
-            if abs(r) < 1e-15:
-                r = 0
-            if abs(i) < 1e-15:
-                i = 0
-            return complex(r, i)
-        else:
-            return expr
-
-
-
-
-
-def test_with_pymbolic():
-    from pymbolic import var
-    vars = numpy.array([var(chr(97+i)) for i in range(16)], dtype=object)
-    print vars
-
-    def wrap_intermediate(x):
-        if len(x) > 1:
-            from hedge.optemplate import make_common_subexpression
-            return make_common_subexpression(x)
-        else:
-            return x
-
-    nzk = NearZeroKiller()
-    print nzk(fft(vars))
-    traced_fft = nzk(fft(vars, wrap_intermediate=wrap_intermediate))
-
-    from pymbolic.mapper.stringifier import PREC_NONE
-    from pymbolic.mapper.c_code import CCodeMapper
-    ccm = CCodeMapper()
-
-    code = [ccm(tfi, PREC_NONE) for tfi in traced_fft]
-
-    for i, cse in enumerate(ccm.cses):
-        print "_cse%d = %s" % (i, cse)
-
-    for i, line in enumerate(code):
-        print "result[%d] = %s" % (i, line)
+if HAVE_PYMBOLIC:
+    from pymbolic.mapper import IdentityMapper
+    class NearZeroKiller(IdentityMapper):
+        def map_constant(self, expr):
+            if isinstance(expr, complex):
+                r = expr.real
+                i = expr.imag
+                if abs(r) < 1e-15:
+                    r = 0
+                if abs(i) < 1e-15:
+                    i = 0
+                return complex(r, i)
+            else:
+                return expr
 
 
 
 
-if __name__ == "__main__":
-    test_with_floats()
-    test_with_pymbolic()
-"""
+
+    def test_with_pymbolic():
+        from pymbolic import var
+        vars = numpy.array([var(chr(97+i)) for i in range(16)], dtype=object)
+        print vars
+
+        def wrap_intermediate(x):
+            if len(x) > 1:
+                from hedge.optemplate import make_common_subexpression
+                return make_common_subexpression(x)
+            else:
+                return x
+
+        nzk = NearZeroKiller()
+        print nzk(fft(vars))
+        traced_fft = nzk(fft(vars, wrap_intermediate=wrap_intermediate))
+
+        from pymbolic.mapper.stringifier import PREC_NONE
+        from pymbolic.mapper.c_code import CCodeMapper
+        ccm = CCodeMapper()
+
+        code = [ccm(tfi, PREC_NONE) for tfi in traced_fft]
+
+        for i, cse in enumerate(ccm.cses):
+            print "_cse%d = %s" % (i, cse)
+
+        for i, line in enumerate(code):
+            print "result[%d] = %s" % (i, line)
+
+
+
+
+    if __name__ == "__main__":
+        test_with_floats()
+        test_with_pymbolic()
