@@ -24,7 +24,7 @@ def wiener(x,k,s=1.,t=0.,shift=0.,scale=1.):
 
 # Evaluates the derivative of the orthonormalized unweighted Wiener rational
 # functions
-def dwiener(x,k,s=1.,t=0.):
+def dwiener(x,k,s=1.,t=0.,shift=0.,scale=1.):
 
     from spyctral.fourier.eval import dfseries as dgenfourier
     from spyctral.wiener.maps import x_to_theta as x2theta
