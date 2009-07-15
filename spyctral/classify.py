@@ -12,7 +12,6 @@ class SpectralBasis:
     indexing_type = None;
     indexing_function = None;
     fftable = False
-    fft_initialized= False
     default_quadrature = lambda N: None
     canonical_quadrature = None
 
@@ -40,8 +39,8 @@ class SpectralBasis:
             self.nodes = self.quadrature.nodes
         else:
             self.nodes = interpolation_nodes
-            # Creates vandermonde and vandermonde_inv by default
-            self.make_nodal_differentiation_matrix()
+        # Creates vandermonde and vandermonde_inv by default
+        self.make_nodal_differentiation_matrix()
 
     def make_vandermonde(self):
         """
@@ -51,42 +50,6 @@ class SpectralBasis:
         """
         self.vandermonde = self.evaluation(self.nodes,self.indices)
 
-    def initialize_fft(self):
-        """
-        If the basis set supports the FFT, this function performs and stores any
-        overhead required to perform the FFT.
-        """
-        if self.fftable:
-            self.__fft_overhead = self.fft_overhead(self.N,**self.parameters)
-            self.fft_initialized = True
-        else:
-            print "This basis set does not support the FFT\n"
-
-    def fft(self,x):
-        """
-        Takes as input nodal evaluations at the FFT grid points and produced
-        modal coefficients corresponding to the basis expansion.
-        """
-        if self.fftable:
-            if not self.fft_initialized:
-                self.initialize_fft()
-            return self.fft_online(x,**self.parameters)
-        else:
-            print "This basis set does not support the FFT\n"
-            return None
-
-    def ifft(self,x):
-        """
-        Takes as input modal coefficients corresponding to the basis and outputs
-        nodal evaluations at the FFT grid points.
-        """
-        if self.fftable:
-            if not self.fft_initialized:
-                self.initialize_fft()
-            return self.ifft_online(x,**self.parameters)
-        else:
-            print "This basis set does not support the FFT\n"
-            return None
 
     def rehash_parameters(self,**kwargs):
         """ 
@@ -95,14 +58,15 @@ class SpectralBasis:
         for key in kwargs.keys():
             self.parameters[key] = kwargs[key]
 
+        self.quadrature = None
         self.vandermonde = None
         self.vandermonde_inverse = None
         self.nodal_differentiation_matrix = None
         self.stiffness_matrix = None
 
-    def scale_nodes(self,L,delta):
+    def scale_nodes(self,L,physical_scale_ratio):
         """
-        Sets the affine scaling factor self.scale so that (delta x N) of the
+        Sets the affine scaling factor self.scale so that (physical_scale_ratio x N) of the
         canonical nodes lie inside [-L,L]. 
         """
         from spyctral.common.scaling import scale_factor
@@ -111,7 +75,7 @@ class SpectralBasis:
             print "Error: cannot scale...I don't have a canonical set of nodes"
         else:
             x = self.canonical_quadrature().nodes
-            scale = scale_factor(L,x,delta=delta)
+            scale = scale_factor(L,x,delta=physical_scale_ratio)
             self.rehash_parameters(scale=scale)
             self.initialize_quadrature(None,None)
             self.make_nodal_differentiation_matrix()
@@ -147,6 +111,54 @@ class SpectralBasis:
             self.make_vandermonde_inverse()
         self.nodal_differentiation_matrix = dot(self.derivative(self.nodes,self.indices), \
                  self.vandermonde_inverse)
+
+class FFTBasis:
+    """
+    Spectral basis method that can use the FFT for modal-nodal transformations.
+    """
+
+    fftable = True
+    fft_initialized= False
+
+    def initialize_fft(self):
+        """
+        If the basis set supports the FFT, this function performs and stores any
+        overhead required to perform the FFT.
+        """
+        if self.fftable:
+            self.rehash_parameters()
+            self.initialize_quadrature(self.fft_nodal_set(),None)
+            self.fft_overhead_data = self.fft_overhead()
+            self.fft_initialized = True
+        else:
+            print "This nodal set does not support the FFT\n"
+
+    def fft(self,x):
+        """
+        Takes as input nodal evaluations at the FFT grid points and produced
+        modal coefficients corresponding to the basis expansion.
+        """
+        if self.fftable:
+            if not self.fft_initialized:
+                self.initialize_fft()
+            return self.fft_online(x)
+        else:
+            print "This basis set does not support the FFT\n"
+            return None
+
+    def ifft(self,x):
+        """
+        Takes as input modal coefficients corresponding to the basis and outputs
+        nodal evaluations at the FFT grid points.
+        """
+        if self.fftable:
+            if not self.fft_initialized:
+                self.initialize_fft()
+            return self.ifft_online(x)
+        else:
+            print "This basis set does not support the FFT\n"
+            return None
+
 
 class WholeSpectralBasis(SpectralBasis):
     """ 

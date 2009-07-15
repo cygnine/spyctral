@@ -39,14 +39,14 @@ class HermitePolynomialBasis(WholeSpectralBasis):
 
     def __init__(self,N=0,quadrature=None,interpolation_nodes=None,
                  filter=None,mu=0.,shift=0.,scale=1.,
-                 physical_scale=None,delta=0.8):
+                 physical_scale=None,physical_scale_ratio=0.8):
         self.basis_type = "Hermite polynomial"
         self.N = N
         self.parameters = {'mu':mu, 'scale':scale,
                 'shift':shift}
         self.assign_indices()
         if physical_scale is not None:
-            self.scale_nodes(physical_scale,delta)
+            self.scale_nodes(physical_scale,physical_scale_ratio)
         self.initialize_quadrature(interpolation_nodes,quadrature)
         self.make_nodal_differentiation_matrix()
 
@@ -67,14 +67,14 @@ class HermiteFunctionBasis(WholeSpectralBasis):
 
     def __init__(self,N=0,quadrature=None,interpolation_nodes=None,
                  filter=None,mu=0.,shift=0.,scale=1.,
-                 physical_scale=None,delta=0.8):
+                 physical_scale=None,physical_scale_ratio=0.8):
         self.basis_type = "Hermite function"
         self.N = N
         self.parameters = {'mu':mu, 'scale':scale,
                 'shift':shift}
         self.assign_indices()
         if physical_scale is not None:
-            self.scale_nodes(physical_scale,delta)
+            self.scale_nodes(physical_scale,physical_scale_ratio)
         self.initialize_quadrature(interpolation_nodes,quadrature)
         self.make_nodal_differentiation_matrix()
 

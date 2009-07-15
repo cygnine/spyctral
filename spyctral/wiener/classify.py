@@ -38,16 +38,17 @@ WienerQuadrature = WeightedWienerQuadrature
 class UnweightedWienerBasis(IntegerSpectralBasis):
     """ Unweighted Wiener rational functions basis. """
 
+    basis_type = "Unweighted Wiener rational function"
+
     def __init__(self,N=0,quadrature=None,interpolation_nodes=None,
                  filter=None,s=1.,t=0.,shift=0.,scale=1.,
-                 physical_scale=None,delta=0.8):
-        self.basis_type = "Unweighted Wiener rational function"
+                 physical_scale=None,physical_scale_ratio=0.8):
         self.N = N
         self.parameters = {'s':s, 't':t, 'scale':scale,
                 'shift':shift}
         self.assign_indices()
         if physical_scale is not None:
-            self.scale_nodes(physical_scale,delta)
+            self.scale_nodes(physical_scale,physical_scale_ratio)
         self.initialize_quadrature(interpolation_nodes,quadrature)
         self.make_nodal_differentiation_matrix()
 
@@ -60,19 +61,31 @@ class UnweightedWienerBasis(IntegerSpectralBasis):
     def derivative(self,x,n):
         return wiener.eval.dwiener(x,n,**self.parameters)
 
-class WeightedWienerBasis(IntegerSpectralBasis):
+class WeightedWienerBasis(FFTBasis,IntegerSpectralBasis):
     """ Weighted Wiener rational functions basis. """
+
+    basis_type = "Weighted Wiener rational function"
+
+    def fft_overhead(self):
+        return wiener.fft.fft_collocation_overhead(self.N,**self.parameters)
+    def fft_online(self,fx):
+        return wiener.fft.fft_collocation_online(fx,self.fft_overhead_data)
+    def ifft_online(self,fx):
+        return wiener.fft.ifft_collocation_online(fx,self.fft_overhead_data)
+    def fft_nodal_set(self):
+        temp = WeightedWienerQuadrature(N=self.N,s=1,t=self.parameters['t'],
+                 scale=self.parameters['scale'], shift=self.parameters['shift'])
+        return temp.nodes
 
     def __init__(self,N=0,quadrature=None,interpolation_nodes=None,
                  filter=None,s=1.,t=0.,shift=0.,scale=1.,
-                 physical_scale=None,delta=0.8):
-        self.basis_type = "Weighted Wiener rational function"
+                 physical_scale=None,physical_scale_ratio=0.8):
         self.N = N
         self.parameters = {'s':s, 't':t, 'scale':scale,
                 'shift':shift}
         self.assign_indices()
         if physical_scale is not None:
-            self.scale_nodes(physical_scale,delta)
+            self.scale_nodes(physical_scale,physical_scale_ratio)
         self.initialize_quadrature(interpolation_nodes,quadrature)
         self.make_nodal_differentiation_matrix()
 
@@ -84,5 +97,9 @@ class WeightedWienerBasis(IntegerSpectralBasis):
 
     def derivative(self,x,n):
         return wiener.eval.dweighted_wiener(x,n,**self.parameters)
+
+    def make_stiffness_matrix(self):
+        self.stiffness_matrix = wiener.matrices.weighted_wiener_stiffness_matrix(self.N,
+                **self.parameters)
 
 WienerBasis = WeightedWienerBasis
