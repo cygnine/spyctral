@@ -16,3 +16,17 @@ def fft_nodal_differentiation(fx,**kwargs):
     stiff = stiffmat(len(fx),**kwargs)
 
     return ifft(stiff*fft(fx,**kwargs),**kwargs)
+
+def apply_stiffness_matrix(modes,**kwargs):
+    """
+    Generates and applies the stiffness matrix to the modal coefficients.
+    """
+    from spyctral.wiener.matrices import weighted_wiener_stiffness_matrix as \
+        stiffmat
+    stiff = stiffmat(len(modes),**kwargs)
+
+    try:
+        from pymbolic.algorithm import csr_matrix_multiply as csr_mult
+        return csr_mult(stiff,modes)
+    except:
+        return stiff*mdoes
