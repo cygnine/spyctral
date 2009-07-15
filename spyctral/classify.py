@@ -14,6 +14,10 @@ class SpectralBasis:
     fftable = False
     fft_initialized= False
     default_quadrature = lambda N: None
+    canonical_quadrature = None
+
+    stiffness_matrix = None
+    mass_matrix = None
 
     def __init__(self,N=0):
         self.N = N
@@ -32,8 +36,7 @@ class SpectralBasis:
             if quadrature is not None:
                 self.quadrature = quadrature
             else:
-                self.quadrature = self.default_quadrature(self.N,
-                                    **self.parameters)
+                self.quadrature = self.canonical_quadrature()
             self.nodes = self.quadrature.nodes
         else:
             self.nodes = interpolation_nodes
@@ -84,6 +87,34 @@ class SpectralBasis:
         else:
             print "This basis set does not support the FFT\n"
             return None
+
+    def rehash_parameters(self,**kwargs):
+        """ 
+        Rehashes self.parameters to reflect changes made to input parameters.
+        """
+        for key in kwargs.keys():
+            self.parameters[key] = kwargs[key]
+
+        self.vandermonde = None
+        self.vandermonde_inverse = None
+        self.nodal_differentiation_matrix = None
+        self.stiffness_matrix = None
+
+    def scale_nodes(self,L,delta):
+        """
+        Sets the affine scaling factor self.scale so that (delta x N) of the
+        canonical nodes lie inside [-L,L]. 
+        """
+        from spyctral.common.scaling import scale_factor
+
+        if self.canonical_quadrature is None:
+            print "Error: cannot scale...I don't have a canonical set of nodes"
+        else:
+            x = self.canonical_quadrature().nodes
+            scale = scale_factor(L,x,delta=delta)
+            self.rehash_parameters(scale=scale)
+            self.initialize_quadrature(None,None)
+            self.make_nodal_differentiation_matrix()
 
     def make_vandermonde_inverse(self):
         """

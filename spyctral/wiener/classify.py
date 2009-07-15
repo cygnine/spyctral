@@ -39,14 +39,20 @@ class UnweightedWienerBasis(IntegerSpectralBasis):
     """ Unweighted Wiener rational functions basis. """
 
     def __init__(self,N=0,quadrature=None,interpolation_nodes=None,
-                 filter=None,s=1.,t=0.,shift=0.,scale=1.):
+                 filter=None,s=1.,t=0.,shift=0.,scale=1.,
+                 physical_scale=None,delta=0.8):
+        self.basis_type = "Unweighted Wiener rational function"
         self.N = N
         self.parameters = {'s':s, 't':t, 'scale':scale,
                 'shift':shift}
-        self.basis_type = "Unweighted Wiener rational function"
-        self.default_quadrature = UnweightedWienerQuadrature
         self.assign_indices()
+        if physical_scale is not None:
+            self.scale_nodes(physical_scale,delta)
         self.initialize_quadrature(interpolation_nodes,quadrature)
+        self.make_nodal_differentiation_matrix()
+
+    def canonical_quadrature(self):
+        return UnweightedWienerQuadrature(N=self.N,**self.parameters)
 
     def evaluation(self,x,n):
         return wiener.eval.wiener(x,n,**self.parameters)
@@ -54,29 +60,29 @@ class UnweightedWienerBasis(IntegerSpectralBasis):
     def derivative(self,x,n):
         return wiener.eval.dwiener(x,n,**self.parameters)
 
-    def gauss_quadrature(self):
-        return wiener.quad.gq(self.N,**self.parameters)
-
 class WeightedWienerBasis(IntegerSpectralBasis):
     """ Weighted Wiener rational functions basis. """
 
     def __init__(self,N=0,quadrature=None,interpolation_nodes=None,
-                 filter=None,s=1.,t=0.,shift=0.,scale=1.):
+                 filter=None,s=1.,t=0.,shift=0.,scale=1.,
+                 physical_scale=None,delta=0.8):
+        self.basis_type = "Weighted Wiener rational function"
         self.N = N
         self.parameters = {'s':s, 't':t, 'scale':scale,
                 'shift':shift}
-        self.basis_type = "Weighted Wiener rational function"
-        self.default_quadrature = WeightedWienerQuadrature
         self.assign_indices()
+        if physical_scale is not None:
+            self.scale_nodes(physical_scale,delta)
         self.initialize_quadrature(interpolation_nodes,quadrature)
+        self.make_nodal_differentiation_matrix()
+
+    def canonical_quadrature(self):
+        return WeightedWienerQuadrature(N=self.N,**self.parameters)
 
     def evaluation(self,x,n):
         return wiener.eval.weighted_wiener(x,n,**self.parameters)
 
     def derivative(self,x,n):
         return wiener.eval.dweighted_wiener(x,n,**self.parameters)
-
-    def gauss_quadrature(self):
-        return wiener.quad.pgq(self.N,**self.parameters)
 
 WienerBasis = WeightedWienerBasis
