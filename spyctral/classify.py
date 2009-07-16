@@ -112,6 +112,22 @@ class SpectralBasis:
         self.nodal_differentiation_matrix = dot(self.derivative(self.nodes,self.indices), \
                  self.vandermonde_inverse)
 
+    def apply_spectral_filter_to_modes(self,modes):
+        return self.filter.apply_filter(modes)
+
+    def make_spectral_filter_matrix_for_nodes(self):
+        from numpy import dot, diag
+        self.spectral_filter_matrix_for_nodes = dot(self.vandermonde,
+                dot(diag(self.filter.modal_weights), self.vandermonde_inverse))
+
+    def apply_spectral_filter_to_nodes(self,fx):
+        """ Use this if you don't want to explicitly build/save the filter matrix
+        operator for some reason."""
+        from numpy import dot, diag
+        temp = dot(self.vandermonde, dot(diag(self.filter.modal_weights),
+            self.vandermonde_inverse))
+        return dot(temp,fx)
+
 class FFTBasis:
     """
     Spectral basis method that can use the FFT for modal-nodal transformations.
@@ -133,7 +149,7 @@ class FFTBasis:
         else:
             print "This nodal set does not support the FFT\n"
 
-    def fft(self,x):
+    def fft(self,fx):
         """
         Takes as input nodal evaluations at the FFT grid points and produced
         modal coefficients corresponding to the basis expansion.
@@ -141,12 +157,12 @@ class FFTBasis:
         if self.fftable:
             if not self.fft_initialized:
                 self.initialize_fft()
-            return self.fft_online(x)
+            return self.fft_online(fx)
         else:
             print "This basis set does not support the FFT\n"
             return None
 
-    def ifft(self,x):
+    def ifft(self,F):
         """
         Takes as input modal coefficients corresponding to the basis and outputs
         nodal evaluations at the FFT grid points.
@@ -154,11 +170,16 @@ class FFTBasis:
         if self.fftable:
             if not self.fft_initialized:
                 self.initialize_fft()
-            return self.ifft_online(x)
+            return self.ifft_online(F)
         else:
             print "This basis set does not support the FFT\n"
             return None
 
+    def apply_spectral_filter_to_nodes(self,fx):
+        """ Use this if you don't want to explicitly build/save the filter matrix
+        operator."""
+        
+        return self.ifft(self.apply_spectral_filter_to_modes(self.fft(fx)))
 
 class WholeSpectralBasis(SpectralBasis):
     """ 
@@ -173,6 +194,21 @@ class WholeSpectralBasis(SpectralBasis):
         self.indices = self.indexing_function(self.N)
         self.modal_fractions = self.indices/float(self.N-1)
 
+    def initialize_filter(self,filter=None):
+        from spyctral.common.indexing import whole_etas
+        if filter is None:
+            # Default filter type:
+            print "Using default Exponential filter...\n"
+            self.filter = spyctral.ExponentialFilter()
+        elif isinstance(filter,spyctral.Filter):
+            self.filter = filter
+        else:
+            raise TypeError("You must initialize a filter with a Filter \
+                class-type, or with None for the default")
+            return None
+        self.filter.etas = whole_etas(self.N)
+        self.filter.initialize_modal_weights()
+
 class IntegerSpectralBasis(SpectralBasis):
     """ 
     SpectralBasis instance for which the modes are indexed as integers
@@ -185,6 +221,21 @@ class IntegerSpectralBasis(SpectralBasis):
         self.indexing_function = spyctral.common.indexing.integer_range
         self.indices = self.indexing_function(self.N)
         self.modal_fractions = self.indices/float(int(self.N)/2)
+
+    def initialize_filter(self,filter=None):
+        from spyctral.common.indexing import integer_etas
+        if filter is None:
+            # Default filter type:
+            print "Using default Exponential filter...\n"
+            self.filter = spyctral.ExponentialFilter()
+        elif isinstance(filter,spyctral.Filter):
+            self.filter = filter
+        else:
+            raise TypeError("You must initialize a filter with a Filter \
+                class-type, or with None for the default")
+            return None
+        self.filter.etas = integer_etas(self.N)
+        self.filter.initialize_modal_weights()
 
 class QuadratureRule:
     """ The basic class type for all quadrature rule instantiations. """
