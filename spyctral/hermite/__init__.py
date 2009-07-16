@@ -8,4 +8,5 @@
 import eval
 import quad
 import nodes
+import weights
 import matrices

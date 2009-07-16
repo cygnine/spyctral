@@ -24,7 +24,17 @@ def sqrt_weight_bias(x,s=1.,t=0.,shift=0.,scale=1.):
 def dsqrt_weight_bias(x,s=1.,t=0.,shift=0.,scale=1.):
 
     y = (x-shift)/scale
-    dws = t*(y-1j) - y*(s+t)
-    dws *= (y**(t-1))/((y-1j)**(s+t+1.))
+    from numpy import array
+
+    dws = -(s+t)*y**t
+    dws = array(dws,dtype=complex)
+    if t != 0:
+        dws += t*y**(t-1)
+    dws /= (y-1j)**(s+t+1.)
     dws *= 2**((s+t)/2.)
+    #dws = t*(y-1j) - y*(s+t)
+    #if t != 0.:
+    #    dws *= y**(t-1.)
+    #if (s+t+1.) != 0:
+    #    dws *= 1./((y-1j)**(s+t+1.))
     return dws/scale

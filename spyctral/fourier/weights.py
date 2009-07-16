@@ -51,9 +51,12 @@ def dsqrt_weight_bias(theta,gamma=0.,delta=0.,shift=0.,scale=1.):
 
     sss(theta,scale=scale,shift=shift)
     phase = exp(1j*(gamma+delta)/2.*(pi-theta))*\
-            2**((gamma+delta-4)/2.)*\
-            abs(sin(theta/2.))**(delta-1)*\
-            cos(theta/2.)**(gamma-1)
+            2**((gamma+delta-4)/2.)
+    if delta != 0.:
+        phase *= abs(sin(theta/2.))**(delta-1)
+    if gamma != 0.:
+        phase *= cos(theta/2.)**(gamma-1)   
+
     w = phase*( delta*(1+exp(-1j*theta)) -\
                 gamma*(1+exp(1j*theta)))
     pss(theta,scale=scale,shift=shift)

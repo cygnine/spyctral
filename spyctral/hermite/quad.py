@@ -37,15 +37,17 @@ def pgq(N,mu=0.,scale=1.,shift=0.):
 
     mu = float(mu) # ???
 
-    [x,w] = gq(N,mu,scale=scale,shift=shift)
+    #[x,w] = gq(N,mu,scale=scale,shift=shift)
+    [x,w] = gq(N,mu=mu)
 
-    sss(x,shift=shift,scale=scale)
+    #sss(x,shift=shift,scale=scale)
     #xt = (x-shift)/scale
     w /= x**(2*mu)*exp(-x**2)
     pss(x,shift=shift,scale=scale)
 
     # I DON'T UNDERSTAND THIS
-    w *= scale**2
+    #w *= scale**2
+    w *= scale
 
     return [x,w]
 
