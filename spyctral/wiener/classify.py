@@ -72,10 +72,10 @@ class WeightedWienerBasis(FFTBasis,IntegerSpectralBasis):
         return wiener.fft.fft_collocation_online(fx,self.fft_overhead_data)
     def ifft_online(self,fx):
         return wiener.fft.ifft_collocation_online(fx,self.fft_overhead_data)
-    def fft_nodal_set(self):
+    def fft_quadrature_rule(self):
         temp = WeightedWienerQuadrature(N=self.N,s=1,t=self.parameters['t'],
                  scale=self.parameters['scale'], shift=self.parameters['shift'])
-        return temp.nodes
+        return temp
 
     def __init__(self,N=0,quadrature=None,interpolation_nodes=None,
                  filter=None,s=1.,t=0.,shift=0.,scale=1.,
@@ -88,6 +88,7 @@ class WeightedWienerBasis(FFTBasis,IntegerSpectralBasis):
             self.scale_nodes(physical_scale,physical_scale_ratio)
         self.initialize_quadrature(interpolation_nodes,quadrature)
         self.make_nodal_differentiation_matrix()
+        self.make_stiffness_matrix()
 
     def canonical_quadrature(self):
         return WeightedWienerQuadrature(N=self.N,**self.parameters)

@@ -126,6 +126,23 @@ class SpectralBasis:
         self.modal_fractions = self.filter_fractions(self.N)
         self.filter.initialize_modal_weights(self.modal_fractions)
 
+    def apply_stiffness_matrix(self,modes):
+        from scipy.sparse.csr import csr_matrix
+        from numpy import ndarray, dot
+        if self.stiffness_matrix is None:
+            self.make_stiffness_matrix()
+        if isinstance(self.stiffness_matrix,csr_matrix):
+            try: 
+                from pymbolic.algorithm import csr_matrix_multiply
+                return csr_matrix_multiply(self.stiffness_matrix,modes)
+            except:
+                return self.stiffness_matrix*modes
+        elif isinstance(self.stiffness_matrix,ndarray):
+            return dot(self.stiffness_matrix,modes)
+        else:
+            raise TypeError("Unrecognized type %s for stiffness matrix" % \
+                    type(self.stiffness_matrix))
+
     def apply_spectral_filter_to_modes(self,modes):
         return self.filter.apply_filter(modes)
 
@@ -157,7 +174,7 @@ class FFTBasis:
         """
         if self.fftable:
             self.rehash_parameters()
-            self.initialize_quadrature(self.fft_nodal_set(),None)
+            self.initialize_quadrature(None,self.fft_quadrature_rule())
             self.fft_overhead_data = self.fft_overhead()
             self.fft_initialized = True
         else:
@@ -188,6 +205,17 @@ class FFTBasis:
         else:
             print "This basis set does not support the FFT\n"
             return None
+
+    def fft_differentiation(self,fx):
+        """
+        Uses the FFT to turn nodal evaluations fx into modal coefficients,
+        applies the stiffness matrix, and then uses to the IFFT to take things
+        back to nodal evaluations.
+        """
+        if not self.fft_initialized:
+            print "You must first initialize the FFT"
+        else:
+            return self.ifft(self.apply_stiffness_matrix(self.fft(fx)))
 
     def apply_spectral_filter_to_nodes(self,fx):
         """ Use this if you don't want to explicitly build/save the filter matrix
