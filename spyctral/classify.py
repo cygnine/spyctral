@@ -112,6 +112,20 @@ class SpectralBasis:
         self.nodal_differentiation_matrix = dot(self.derivative(self.nodes,self.indices), \
                  self.vandermonde_inverse)
 
+    def initialize_filter(self,filter=None):
+        if filter is None:
+            # Default filter type:
+            print "Using default Exponential filter..."
+            self.filter = spyctral.ExponentialFilter()
+        elif isinstance(filter,spyctral.Filter):
+            self.filter = filter
+        else:
+            raise TypeError("You must initialize a filter with a Filter \
+                class-type, or with None for the default")
+            return None
+        self.modal_fractions = self.filter_fractions(self.N)
+        self.filter.initialize_modal_weights(self.modal_fractions)
+
     def apply_spectral_filter_to_modes(self,modes):
         return self.filter.apply_filter(modes)
 
@@ -121,7 +135,7 @@ class SpectralBasis:
                 dot(diag(self.filter.modal_weights), self.vandermonde_inverse))
 
     def apply_spectral_filter_to_nodes(self,fx):
-        """ Use this if you don't want to explicitly build/save the filter matrix
+        """ Use this if you don't want to explicitly save the filter matrix
         operator for some reason."""
         from numpy import dot, diag
         temp = dot(self.vandermonde, dot(diag(self.filter.modal_weights),
@@ -179,7 +193,13 @@ class FFTBasis:
         """ Use this if you don't want to explicitly build/save the filter matrix
         operator."""
         
-        return self.ifft(self.apply_spectral_filter_to_modes(self.fft(fx)))
+        if self.fft_initialized:
+            return self.ifft(self.apply_spectral_filter_to_modes(self.fft(fx)))
+        else:
+            from numpy import dot, diag
+            temp = dot(self.vandermonde, dot(diag(self.filter.modal_weights),
+                self.vandermonde_inverse))
+            return dot(temp,fx)
 
 class WholeSpectralBasis(SpectralBasis):
     """ 
@@ -191,23 +211,11 @@ class WholeSpectralBasis(SpectralBasis):
         Assigns default whole-number indices derived from self.N
         """
         self.indexing_function = spyctral.common.indexing.whole_range
+        self.filter_fractions = spyctral.common.indexing.whole_etas
         self.indices = self.indexing_function(self.N)
-        self.modal_fractions = self.indices/float(self.N-1)
+        #self.modal_fractions = self.indices/float(self.N-1)
 
-    def initialize_filter(self,filter=None):
-        from spyctral.common.indexing import whole_etas
-        if filter is None:
-            # Default filter type:
-            print "Using default Exponential filter...\n"
-            self.filter = spyctral.ExponentialFilter()
-        elif isinstance(filter,spyctral.Filter):
-            self.filter = filter
-        else:
-            raise TypeError("You must initialize a filter with a Filter \
-                class-type, or with None for the default")
-            return None
-        self.filter.etas = whole_etas(self.N)
-        self.filter.initialize_modal_weights()
+
 
 class IntegerSpectralBasis(SpectralBasis):
     """ 
@@ -219,23 +227,9 @@ class IntegerSpectralBasis(SpectralBasis):
         Assigns default integer-number indices derived from self.N
         """
         self.indexing_function = spyctral.common.indexing.integer_range
+        self.filter_fractions = spyctral.common.indexing.integer_etas
         self.indices = self.indexing_function(self.N)
-        self.modal_fractions = self.indices/float(int(self.N)/2)
-
-    def initialize_filter(self,filter=None):
-        from spyctral.common.indexing import integer_etas
-        if filter is None:
-            # Default filter type:
-            print "Using default Exponential filter...\n"
-            self.filter = spyctral.ExponentialFilter()
-        elif isinstance(filter,spyctral.Filter):
-            self.filter = filter
-        else:
-            raise TypeError("You must initialize a filter with a Filter \
-                class-type, or with None for the default")
-            return None
-        self.filter.etas = integer_etas(self.N)
-        self.filter.initialize_modal_weights()
+        #self.modal_fractions = self.indices/float(int(self.N)/2)
 
 class QuadratureRule:
     """ The basic class type for all quadrature rule instantiations. """
