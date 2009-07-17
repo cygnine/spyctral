@@ -87,6 +87,10 @@ class HermiteFunctionBasis(WholeSpectralBasis):
     def derivative(self,x,n):
         return hermite.eval.dhermite_function(x,n,**self.parameters)
 
+    def make_stiffness_matrix(self):
+        self.stiffness_matrix = hermite.matrices.stiffness_matrix(self.N,
+                **self.parameters)
+
 #    def gauss_quadrature(self):
 #        return hermite.quad.pgq(self.N,**self.parameters)
 

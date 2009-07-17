@@ -23,12 +23,12 @@ class Filter:
 
 class ExponentialFilter(Filter):
     import numpy
-    from numpy import log
 
-    def __init__(self,truncation_value = -log(numpy.finfo(float).eps),
+    def __init__(self,truncation_value = numpy.finfo(float).eps,
             filter_order=8., preservation_ratio=0.5):
+        from numpy import log
 
-        self.parameters = {'alpha': truncation_value,
+        self.parameters = {'alpha': -log(truncation_value),
                 'p': filter_order,
                 'eta_cutoff': preservation_ratio}
 

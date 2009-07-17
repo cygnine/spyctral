@@ -21,7 +21,6 @@ class SpectralBasis:
     def __init__(self,N=0):
         self.N = N
 
-
     def __str__(self):
         return str(self.basis_type) + \
                 " spectral basis expansion with %d degrees of freedom" % self.N

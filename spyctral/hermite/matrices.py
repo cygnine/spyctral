@@ -28,4 +28,4 @@ def stiffness_matrix(N,mu=0.,shift=0.,scale=1.):
     ns = arange(N)
     smat += diag(sqrt(ns[1:]/2.),k=1)
     smat -= diag(sqrt((ns[:(N-1)]+1)/2.),k=-1)
-    return csc_matrix(smat/scale)
+    return csc_matrix(smat/scale).tocsr()
