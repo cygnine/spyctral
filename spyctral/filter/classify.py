@@ -24,7 +24,7 @@ class Filter:
 class ExponentialFilter(Filter):
     import numpy
 
-    def __init__(self,truncation_value = numpy.finfo(float).eps,
+    def __init__(self,N=0,truncation_value = numpy.finfo(float).eps,
             filter_order=8., preservation_ratio=0.5):
         from numpy import log
 
