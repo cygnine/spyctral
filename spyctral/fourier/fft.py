@@ -138,6 +138,7 @@ def ifft_online(f,overhead):
     fx = roll(fx,-(N/2))
 
     if fx.dtype==object:
-        return pyfft.fft(fx,sign=-1)/float(N)
+        import pymbolic.algorithm as pyalg
+        return pyalg.sym_fft(fx,sign=-1)/float(N)
     else:
         return ift(fx)
