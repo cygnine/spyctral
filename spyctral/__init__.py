@@ -7,6 +7,7 @@ import wiener
 import mapjpoly
 import hermite
 import filter
+import debug
 
 from spyctral.filter.classify import *
 from classify import *

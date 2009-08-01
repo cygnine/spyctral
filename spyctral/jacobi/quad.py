@@ -1,20 +1,14 @@
 #!/usr/bin/env python
-"""
-* File Name : quad.py
+#
+# Jacobi polynomial quadrature package
 
-* Creation Date : 2009-06-17
-
-* Created By : Akil Narayan
-
-* Last Modified : Wed 17 Jun 2009 03:58:33 PM EDT
-
-* Purpose : 
-"""
-
-def gq(N,alpha=-1/2.,beta=-1/2.,shift=0.,scale=1.) : 
+def gauss_quadrature(N,alpha=-1/2.,beta=-1/2.,shift=0.,scale=1.) : 
 # Returns the N-point Jacobi-Gauss(alpha,beta) quadrature rule over the interval
-# (-scale,scale)+shift
-# The quadrature rule is normalized to reflect the real Jacobian
+# (-scale,scale)+shift.
+# The quadrature rule is *not* normalized in the sense that the affine parameters
+# shift and scale are built into the new weight function for which this
+# quadrature rule is valid.
+
     from coeffs import recurrence_range
     from spyctral.opoly1d.quad import gq as ogq
     from spyctral import chebyshev
@@ -26,13 +20,16 @@ def gq(N,alpha=-1/2.,beta=-1/2.,shift=0.,scale=1.) :
     else :
         [a,b] = recurrence_range(N,alpha,beta)
         temp = ogq(a,b)
-        temp[1] *= scale  # scale Jacobian
         pss(temp[0],scale=scale,shift=shift)
         return temp
 
-def grq(N,alpha=-1/2.,beta=-1/2.,r0=None,shift=0.,scale=1.) : 
+def gauss_radau_quadrature(N,alpha=-1/2.,beta=-1/2.,r0=None,shift=0.,scale=1.) : 
 # Returns the N-point Jacobi-Gauss-Radau(alpha,beta) quadrature rule over the interval
 # (-scale,scale)+shift
+# For nontrivial values of shift, scale, the weight function associated with
+# this quadrature rule is the directly-mapped Jacobi weight + the Jacobian
+# factor introduced by scale.
+
     from numpy import array
     from coeffs import recurrence_range
     from spyctral.opoly1d.quad import grq as ogrq
@@ -54,12 +51,14 @@ def grq(N,alpha=-1/2.,beta=-1/2.,r0=None,shift=0.,scale=1.) :
         temp = ogrq(a,b,r0=r0)
         pss(r0,scale=scale,shift=shift)
         pss(temp[0],scale=scale,shift=shift)
-        temp[1] *= scale
         return temp
 
-def glq(N,alpha=-1/2.,beta=-1/2.,r0=None,shift=0.,scale=1.) : 
+def gauss_lobatto_quadrature(N,alpha=-1/2.,beta=-1/2.,r0=None,shift=0.,scale=1.) : 
 # Returns the N-point Jacobi-Gauss-Lobatto(alpha,beta) quadrature rule over the interval
 # (-scale,scale)+shift
+# For nontrivial values of shift, scale, the weight function associated with
+# this quadrature rule is the directly-mapped Jacobi weight + the Jacobian
+# factor introduced by scale.
 
     from coeffs import recurrence_range
     from numpy import array
@@ -81,5 +80,10 @@ def glq(N,alpha=-1/2.,beta=-1/2.,r0=None,shift=0.,scale=1.) :
         temp = oglq(a,b,r0=r0)
         pss(r0,scale=scale,shift=shift)
         pss(temp[0],scale=scale,shift=shift)
-        temp[1] *= scale
+        #temp[1] *= scale
         return temp
+
+############### ALIASES #################
+gq = gauss_quadrature
+grq = gauss_radau_quadrature
+glq = gauss_lobatto_quadrature

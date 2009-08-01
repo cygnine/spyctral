@@ -1,18 +1,9 @@
 #!/usr/bin/env python
-"""
-* File Name : eval.py
-
-* Creation Date : 2009-06-17
-
-* Created By : Akil Narayan
-
-* Last Modified : Wed 17 Jun 2009 03:41:32 PM EDT
-
-* Purpose :
+""" 
+Package for evaluation of Jacobi polynomials
 """
 
-
-def jpoly(x,n,alpha=-1/2.,beta=-1/2.,d=0, normalization='normal',scale=1., shift=0.) :
+def jacobi_polynomial(x,n,alpha=-1/2.,beta=-1/2.,d=0, normalization='normal',scale=1., shift=0.) :
     """
     Evaluates the Jacobi polynomials of class (alpha,beta), order n (list)
     at the points x (list/array). The normalization is specified by the keyword
@@ -27,7 +18,7 @@ def jpoly(x,n,alpha=-1/2.,beta=-1/2.,d=0, normalization='normal',scale=1., shift
     from spyctral.common.maps import standard_scaleshift as sss
 
     x = array(x)
-    if all([type(n) != test for test in [list,ndarray]]):
+    if all([type(n) != dtype for dtype in [list,ndarray]]):
         # Then it's probably an int
         n = array([n])
     n = array(n)
@@ -56,10 +47,19 @@ def jpoly(x,n,alpha=-1/2.,beta=-1/2.,d=0, normalization='normal',scale=1., shift
 
     return temp
 
-# Temporary function to evaluate Jacobi derivatives
-def djpoly(x,n,alpha=-1/2.,beta=-1/2.,normalization='normal',scale=1.,shift=0.):
+def jacobi_polynomial_derivative(x,n,alpha=-1/2.,beta=-1/2.,normalization='normal',scale=1.,shift=0.):
+    """
+    Evaluates the derivative of the Jacobi polynomial with specified
+    normalization. Although this is possible using jacobi_polynomial, this
+    function evaluates the polynomial of order (alpha+1,beta+1) and scales it
+    accordingly. 
+    """
     from coeffs import zetan
     from numpy import array
     zetas = zetan(array(n),alpha=alpha,beta=beta,normalization=normalization)/scale
-    return jpoly(x,array(n)-1,alpha+1.,beta+1.,normalization=normalization,\
+    return jacobi_polynomial(x,array(n)-1,alpha+1.,beta+1.,normalization=normalization,\
                  shift=shift,scale=scale)*zetas
+
+############### ALIASES #################
+jpoly = jacobi_polynomial
+djpoly = jacobi_polynomial_derivative
