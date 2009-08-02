@@ -4,116 +4,143 @@ Package for debugging Jacobi polynomials
 """
 
 from __future__ import division
+from spyctral.debug.debug_tools import ValidationTest, ValidationContainer 
 
 def gauss_test(N,alpha,beta,scale=1.,shift=0.,tol=1e-8):
 
     from spyctral.jacobi.quad import gq
     from numpy import abs, max, all
-    flags = list()
-    descriptions = list()
-    parameters = list()
+    tests = ValidationContainer()
+
+    def val1(data,**kwargs):
+        r = data[0]
+        return max(abs(r-shift)/scale)<1+tol
 
     jargs = dict(N=N,alpha=alpha,beta=beta,scale=scale,shift=shift)
 
-    [r,w] = gq(N,alpha=alpha,beta=beta,shift=shift,scale=scale)
+    tests.append(ValidationTest(\
+         description="Gauss quadrature points inside interval",
+         parameters = jargs,
+         data_generator = gq,
+         validator = val1))
+    
+    def val2(data,**kwargs):
+        w = data[1]
+        return all(w>=-tol)
 
-    flags.append(max(abs(r-shift)/scale)<1+tol)
-    descriptions.append("Gauss quadrature points inside interval")
-    parameters.append(jargs)
-
-    flags.append(all(w>=-tol))
-    descriptions.append("Gauss quadrature weights positive")
-    parameters.append(parameters[-1])
-
-    return flags,descriptions,parameters
+    tests.append(ValidationTest(\
+            description = "Gauss quadrature weights positive",
+            parameters = jargs,
+            data_generator = gq,
+            validator = val2))
+    
+    return tests
 
 def gauss_radau_test(N,alpha,beta,r0=-1.,scale=1.,shift=0.,tol=1e-8):
 
     from spyctral.jacobi.quad import grq
     from numpy import max, abs, all
-    flags = list()
-    descriptions = list()
-    parameters = list()
 
-    [r,w] = grq(N=N,alpha=alpha,beta=beta,r0=r0,shift=shift,scale=scale)
+    tests = ValidationContainer()
 
     jargs = dict(N=N,alpha=alpha,beta=beta,scale=scale,shift=shift,r0=r0)
 
-    flags.append(max(abs(r-shift)/scale)<=1+tol)
-    descriptions.append("Gauss-Radau nodes inside interval")
-    parameters.append(jargs)
+    def val1(data,**kwargs):
+        r = data[0]
+        return max(abs(r-shift)/scale)<=1+tol
 
-    flags.append(any(abs(r-r0)<tol))
-    descriptions.append("Gauss-Radau node")
-    parameters.append(parameters[-1])
+    tests.append(ValidationTest(\
+         description="Gauss-Radau nodes inside interval",
+         parameters = jargs,
+         data_generator = grq,
+         validator = val1))
 
-    flags.append(all(w>=-tol))
-    descriptions.append("Gauss-Radau quadrature weights positive")
-    parameters.append(parameters[-1])
+    def val2(data,**kwargs):
+        r = data[0]
+        return any(abs(r-r0)<tol)
 
-    return flags,descriptions,parameters
+    tests.append(ValidationTest(\
+         description="Gauss-Radau node",
+         parameters = jargs,
+         data_generator = grq,
+         validator = val2))
+
+    def val3(data,**kwargs):
+        w = data[1]
+        return all(w>=-tol)
+
+    tests.append(ValidationTest(\
+         description="Gauss-Radau weights positive",
+         parameters = jargs,
+         data_generator = grq,
+         validator = val3))
+
+    return tests
 
 def gauss_lobatto_test(N,alpha,beta,scale=1.,shift=0.,tol=1e-8):
 
     from spyctral.jacobi.quad import glq
     from numpy import max, abs, all
-    flags = list()
-    descriptions = list()
-    parameters = list()
-
-    [r,w] = glq(N=N,alpha=alpha,beta=beta,shift=shift,scale=scale)
+    tests = ValidationContainer()
 
     jargs = dict(N=N,alpha=alpha,beta=beta,scale=scale,shift=shift)
 
-    flags.append(max(abs(r-shift)/scale)<=1+tol)
-    descriptions.append("Gauss-Lobatto nodes inside interval")
-    parameters.append(jargs)
+    def val1(data,**kwargs):
+        r = data[0]
+        return max(abs(r-shift)/scale)<=1+tol
 
-    flags.append((abs(r[0]-shift+scale)<tol) and (abs(r[-1]-shift-scale)<tol))
-    descriptions.append("Gauss-Lobatto nodes at -1, +1")
-    parameters.append(parameters[-1])
+    tests.append(ValidationTest(\
+         description="Gauss-Lobatto nodes inside interval",
+         parameters = jargs,
+         data_generator = glq,
+         validator = val1))
 
-    flags.append(all(w>=-tol))
-    descriptions.append("Gauss-Lobatto quadrature weights positive")
-    parameters.append(parameters[-1])
+    def val2(data,**kwargs):
+        r = data[0]
+        return (abs(r[0]-shift+scale)<tol) and (abs(r[-1]-shift-scale)<tol)
 
-    return flags,descriptions,parameters
+    tests.append(ValidationTest(\
+         description="Gauss-Lobatto nodes at -1, +1",
+         parameters = jargs,
+         data_generator = glq,
+         validator = val2))
+
+    def val3(data,**kwargs):
+        w = data[1]
+        return all(w>=-tol)
+
+    tests.append(ValidationTest(\
+         description="Gauss-Lobatto quadrature weights positive",
+         parameters = jargs,
+         data_generator = glq,
+         validator = val3))
+
+    return tests
 
 def quadrature_test(N,alpha,beta):
     from scipy import rand, randn
-    flags = list()
-    descriptions = list()
-    parameters = list()
-
-    container = [flags,descriptions,parameters]
 
     tol = 1e-8
-
-    def extend_list_pair(f,g):
-        f.extend(g)
-
-    def test_wrapper(fun,**kwargs):
-        map(extend_list_pair, container, 
-                fun(**kwargs))
+    quad_tests = ValidationContainer()
 
     jargs = dict(N=N,alpha=alpha,beta=beta)
 
-    test_wrapper(gauss_test, **jargs)
-    test_wrapper(gauss_radau_test, r0=-1., **jargs)
-    test_wrapper(gauss_radau_test, r0=1., **jargs)
-    test_wrapper(gauss_lobatto_test, **jargs)
+    quad_tests.extend(gauss_test(tol=tol,**jargs))
+    quad_tests.extend(gauss_radau_test(r0=-1.,tol=tol,**jargs))
+    quad_tests.extend(gauss_radau_test(r0=1.,tol=tol,**jargs))
+    quad_tests.extend(gauss_lobatto_test(tol=tol,**jargs))
 
     shift = randn()
     scale = 2*rand()
     jargs['shift'] = shift
     jargs['scale'] = scale
 
-    test_wrapper(gauss_test, **jargs)
-    test_wrapper(gauss_radau_test, r0=-(scale)+shift, **jargs)
-    test_wrapper(gauss_radau_test, r0=scale+shift, **jargs)
-    test_wrapper(gauss_lobatto_test, **jargs)
+    quad_tests.extend(gauss_test(tol=tol,**jargs))
+    quad_tests.extend(gauss_radau_test(r0=-(scale)+shift, tol=tol,**jargs))
+    quad_tests.extend(gauss_radau_test(r0=scale+shift, tol=tol,**jargs))
+    quad_tests.extend(gauss_lobatto_test(tol=tol,**jargs))
 
-    return flags,descriptions,parameters
+    return quad_tests
 
 def driver():
     """ 
@@ -123,36 +150,26 @@ def driver():
     from scipy import rand, randn
     from numpy import ceil
 
-    flags = list()
-    descriptions = list()
-    parameters = list()
-
-    container = [flags, descriptions, parameters]
-
-    def extend_list_pair(f,g):
-        f.extend(g)
-
-    def test_wrapper(newstuff,oldstuff):
-        map(extend_list_pair, oldstuff, newstuff)
+    all_tests = ValidationContainer()
 
     """ Chebyshev case """
     N = int(ceil(150*rand()))
-    test_wrapper(quadrature_test(N,alpha=-1/2.,beta=-1/2.), container)
+    all_tests.extend(quadrature_test(N,alpha=-1/2., beta=-1/2.))
 
     """ Legendre case """
     N = int(ceil(150*rand()))
-    test_wrapper(quadrature_test(N, alpha=0., beta=0.), container)
+    all_tests.extend(quadrature_test(N, alpha=0., beta=0.))
 
     """ Random case 1 """
     N = int(ceil(150*rand()))
     alpha = -1 + 11*rand()
     beta = -1 + 11*rand()
-    test_wrapper(quadrature_test(N, alpha=alpha,beta=beta), container)
+    all_tests.extend(quadrature_test(N, alpha=alpha, beta=beta))
 
     """ Random case 2 """
     N = int(ceil(150*rand()))
     alpha = -1 + 11*rand()
     beta = -1 + 11*rand()
-    test_wrapper(quadrature_test(N, alpha=alpha,beta=beta), container)
+    all_tests.extend(quadrature_test(N, alpha=alpha, beta=beta))
 
-    return container
+    return all_tests
