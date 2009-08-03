@@ -23,7 +23,7 @@ def gauss_test(N,alpha,beta,scale=1.,shift=0.,tol=1e-8):
     jargs = dict(N=N,alpha=alpha,beta=beta,scale=scale,shift=shift)
 
     tests.append(ValidationTest(\
-         description="Gauss quadrature points inside interval",
+         description="Jacobi Gauss quadrature points inside interval",
          parameters = jargs,
          data_generator = gq,
          validator = val1))
@@ -33,7 +33,7 @@ def gauss_test(N,alpha,beta,scale=1.,shift=0.,tol=1e-8):
         return all(w>=-tol)
 
     tests.append(ValidationTest(\
-            description = "Gauss quadrature weights positive",
+            description = "Jacobi Gauss quadrature weights positive",
             parameters = jargs,
             data_generator = gq,
             validator = val2))
@@ -52,7 +52,7 @@ def gauss_test(N,alpha,beta,scale=1.,shift=0.,tol=1e-8):
         return max(abs(errs))<tol
 
     tests.append(ValidationTest(\
-            description = "Gauss quadrature integration accuracy",
+            description = "Jacobi Gauss quadrature integration accuracy",
             parameters = jargs,
             data_generator = dgen1,
             validator = val3))
@@ -73,7 +73,7 @@ def gauss_radau_test(N,alpha,beta,r0=-1.,scale=1.,shift=0.,tol=1e-8):
         return max(abs(r-shift)/scale)<=1+tol
 
     tests.append(ValidationTest(\
-         description="Gauss-Radau nodes inside interval",
+         description = "Jacobi Gauss-Radau nodes inside interval",
          parameters = jargs,
          data_generator = grq,
          validator = val1))
@@ -83,7 +83,7 @@ def gauss_radau_test(N,alpha,beta,r0=-1.,scale=1.,shift=0.,tol=1e-8):
         return any(abs(r-r0)<tol)
 
     tests.append(ValidationTest(\
-         description="Gauss-Radau node",
+         description = "Jacobi Gauss-Radau node",
          parameters = jargs,
          data_generator = grq,
          validator = val2))
@@ -93,7 +93,7 @@ def gauss_radau_test(N,alpha,beta,r0=-1.,scale=1.,shift=0.,tol=1e-8):
         return all(w>=-tol)
 
     tests.append(ValidationTest(\
-         description="Gauss-Radau weights positive",
+         description = "Jacobi Gauss-Radau weights positive",
          parameters = jargs,
          data_generator = grq,
          validator = val3))
@@ -113,7 +113,7 @@ def gauss_radau_test(N,alpha,beta,r0=-1.,scale=1.,shift=0.,tol=1e-8):
         return max(abs(errs))<tol
 
     tests.append(ValidationTest(\
-            description = "Gauss-Radau quadrature integration accuracy",
+            description = "Jacobi Gauss-Radau quadrature integration accuracy",
             parameters = jargs,
             data_generator = dgen1,
             validator = val4))
@@ -133,7 +133,7 @@ def gauss_lobatto_test(N,alpha,beta,scale=1.,shift=0.,tol=1e-8):
         return max(abs(r-shift)/scale)<=1+tol
 
     tests.append(ValidationTest(\
-         description="Gauss-Lobatto nodes inside interval",
+         description = "Jacobi Gauss-Lobatto nodes inside interval",
          parameters = jargs,
          data_generator = glq,
          validator = val1))
@@ -143,7 +143,7 @@ def gauss_lobatto_test(N,alpha,beta,scale=1.,shift=0.,tol=1e-8):
         return (abs(r[0]-shift+scale)<tol) and (abs(r[-1]-shift-scale)<tol)
 
     tests.append(ValidationTest(\
-         description="Gauss-Lobatto nodes at -1, +1",
+         description = "Jacobi Gauss-Lobatto nodes at -1, +1",
          parameters = jargs,
          data_generator = glq,
          validator = val2))
@@ -153,7 +153,7 @@ def gauss_lobatto_test(N,alpha,beta,scale=1.,shift=0.,tol=1e-8):
         return all(w>=-tol)
 
     tests.append(ValidationTest(\
-         description="Gauss-Lobatto quadrature weights positive",
+         description = "Jacobi Gauss-Lobatto quadrature weights positive",
          parameters = jargs,
          data_generator = glq,
          validator = val3))
@@ -173,7 +173,7 @@ def gauss_lobatto_test(N,alpha,beta,scale=1.,shift=0.,tol=1e-8):
         return max(abs(errs))<tol
 
     tests.append(ValidationTest(\
-            description = "Gauss-Lobatto quadrature integration accuracy",
+            description = "Jacobi Gauss-Lobatto quadrature integration accuracy",
             parameters = jargs,
             data_generator = dgen1,
             validator = val4))
@@ -201,7 +201,7 @@ def mass_test(N,alpha,beta,scale=1.,shift=0.,tol=1e-8):
         return norm(mass - eye(N))<tol
 
     tests.append(ValidationTest(\
-            description = "Orthonormal poly mass matrix",
+            description = "Jacobi Orthonormal poly mass matrix",
             parameters = jargs,
             data_generator = dgen1,
             validator = val1))

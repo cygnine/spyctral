@@ -2,10 +2,11 @@ import common
 
 import opoly1d
 import jacobi
+import laguerre
+import hermite
 import fourier
 import wiener
 import mapjpoly
-import hermite
 import filter
 import debug
 
