@@ -15,8 +15,8 @@ from scipy import pi
 
 def gq(N,scale=1.,shift=0.):
 
-
-    w = scale*pi/float(N)*ones([N])
+    #w = scale*pi/float(N)*ones([N])
+    w = pi/float(N)*ones([N])
 
     temp = linspace(pi,0,N+1)
     x = scale*cos(temp[:N]-pi/(2.*N)) + shift
@@ -25,7 +25,8 @@ def gq(N,scale=1.,shift=0.):
 
 def glq(N,shift=0.,scale=1.) :
 
-    w = scale*pi/float(N-1)*ones([N])
+    #w = scale*pi/float(N-1)*ones([N])
+    w = pi/float(N-1)*ones([N])
     w[0] *= 1/2.
     w[N-1] *= 1/2.
 
@@ -43,7 +44,8 @@ def grq(N,r0=-1.,shift=0.,scale=1.) :
     interval, use jacobi.grquad instead.
     """
 
-    w = scale*pi/float(N-0.5)*ones([N])
+    #w = scale*pi/float(N-0.5)*ones([N])
+    w = pi/float(N-0.5)*ones([N])
     w[0] *= 1/2.
 
     temp = linspace(pi,-pi,2*N)

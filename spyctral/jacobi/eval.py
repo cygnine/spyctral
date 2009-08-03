@@ -27,15 +27,15 @@ def jacobi_polynomial(x,n,alpha=-1/2.,beta=-1/2.,d=0, normalization='normal',sca
 
     # dummy function for scaling
     def scale_ones(n,alpha,beta):
-        return ones(n.shape)
+        return ones([1,len(n)])
 
     # Set up different normalizations
     normal_fun = {'normal': eval_normalized_opoly,
                   'normalized': eval_normalized_opoly,
                   'monic': eval_opoly}
 
-    normal_scale = {'normal': lambda n,alpha,beta: 1/sqrt(scale),
-                    'normalized': lambda n, alpha,beta: 1/sqrt(scale),
+    normal_scale = {'normal': scale_ones,
+                    'normalized': scale_ones,
                     'monic': scale_ones}
 
     # Shift to standard interval and use opoly 3-term recurrence

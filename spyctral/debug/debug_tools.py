@@ -64,7 +64,10 @@ class ValidationContainer:
     def run_tests(self):
         self.failed_test_indices = list()
         for f_test,n in zip(self.validation_tests,range(self.N)):
-            f_test.run_test()
+            try:
+                f_test.run_test()
+            except:
+                f_test.result = False
             if not f_test.result:
                 self.failed_test_indices.append(n)
 
@@ -77,8 +80,11 @@ class ValidationContainer:
         if len(self.failed_test_indices)==0:
             print "All tests passed"
         else:
-            for n in self.failed_tests:
+            for n in self.failed_test_indices:
                 print self.validation_tests[n]
+
+    def failed_tests(self):
+        return [self.validation_tests[n] for n in self.failed_test_indices]
 
     def show_passed_tests(self):
         for test in self.validation_tests:
