@@ -53,7 +53,7 @@ def laguerre_function(x,n,alpha=0.,scale=1.,shift=0.):
     polynomials with the weight function multiplicatively distributed to the
     polynomials.
     """
-    from spyctral.laguerre.weight import sqrt_weight
+    from spyctral.laguerre.weights import sqrt_weight
 
     lpolys = laguerre_polynomial(x=x,n=n,alpha=alpha,scale=scale,shift=shift)
     w = sqrt_weight(x=x,alpha=alpha,shift=shift,scale=scale)
@@ -68,8 +68,7 @@ def laguerre_polynomial_derivative(x,n,alpha=0.,normalization='normal',scale=1.,
     accordingly. 
     """
 
-    print "not implemented yet"
-    return None
+    raise NotImplementedError("Use laguerre_polynomial with input d=1 for now")
 
 def laguerre_function_derivative(x,n,alpha=0.,scale=1.,shift=0.):
     """
@@ -77,7 +76,7 @@ def laguerre_function_derivative(x,n,alpha=0.,scale=1.,shift=0.):
     the Laguerre polynomials with the weight function multiplicatively
     distributed to the polynomials.
     """
-    from spyctral.laguerre.weight import sqrt_weight, dsqrt_weight
+    from spyctral.laguerre.weights import sqrt_weight, dsqrt_weight
 
     w = sqrt_weight(x=x,alpha=alpha,shift=shift,scale=scale)
     dw = dsqrt_weight(x=x,alpha=alpha,shift=shift,scale=scale)
